@@ -1,0 +1,112 @@
+<style>
+  /*
+This CSS code is styling various elements related to a calculator widget or form.
+*/
+
+  /* Styles for radio button inputs */
+  .rg-container input {
+    position: absolute;
+    /* Positions the radio button inputs absolutely */
+    opacity: 0;
+    /* Makes the radio button inputs invisible */
+    cursor: pointer;
+    /* Changes the cursor to a pointer when hovering over the radio button */
+  }
+
+  /* Styles for the radio button checkmark when checked */
+  .rg-container input:checked~.radio-checkmark {
+    border: 0.125rem solid rgb(27, 176, 219);
+    /* Adds a border to the checkmark when the radio button is checked */
+  }
+
+  /* Hides the radio button indicator (dot/circle) when not checked */
+  .radio-checkmark:after {
+    content: "";
+    /* Creates an empty pseudo-element */
+    position: absolute;
+    /* Positions the pseudo-element absolutely */
+    display: none;
+    /* Hides the pseudo-element by default */
+  }
+
+  /* Shows the radio button indicator (dot/circle) when checked */
+  .rg-container input:checked~.radio-checkmark:after {
+    display: block;
+    /* Displays the pseudo-element as a block when the radio button is checked */
+  }
+
+  /* Styles for the radio button indicator (dot/circle) */
+  .rg-container .radio-checkmark:after {
+    top: 2px;
+    /* Positions the indicator 2 pixels from the top */
+    left: 2px;
+    /* Positions the indicator 2 pixels from the left */
+    width: 16px;
+    /* Sets the width of the indicator to 16 pixels */
+    height: 16px;
+    /* Sets the height of the indicator to 16 pixels */
+    border-radius: 50%;
+    /* Makes the indicator a circle */
+    background: rgb(27, 176, 219);
+    /* Sets the background color of the indicator */
+  }
+
+  /* Styles for a selected card option */
+  .selected.ac-card-option {
+    border: 0.125rem solid rgb(27, 167, 218);
+    /* Adds a border to the selected card option */
+  }
+
+  /* Styles for the header of a selected card option */
+  .selected .ac-card-option-header {
+    background-color: rgb(0, 79, 120);
+    /* Sets the background color of the selected card option header */
+    border-bottom: border 0.125rem solid rgb(27, 167, 218);
+    /* Adds a bottom border to the selected card option header */
+  }
+
+  /* Styles for the radio label text in a selected card option */
+  .selected .ac-radio-label {
+    color: white;
+    /* Sets the text color of the radio label to white */
+  }
+
+  /* Styles for the price number in a selected card option */
+  .selected .ac-price-number {
+    color: white;
+    /* Sets the text color of the price number to white */
+  }
+
+  /* Styles for the monthly price text in a selected card option */
+  .selected .ac-price-monthly {
+    color: white;
+    /* Sets the text color of the monthly price text to white */
+  }
+
+  /* Styles for an image in a "more coverage needed" section with a "save to my email" class */
+  .more-coverage-needed.save-to-my-email img {
+    margin-right: -10px;
+    /* Adds a negative right margin to the image */
+  }
+
+  /* Styles for an ad price element */
+  .ad-price {
+    white-space: nowrap;
+    /* Prevents the ad price text from wrapping */
+  }
+
+  /* Media query for screens with a maximum width of 1100 pixels */
+  @media (max-width: 1100px) {
+    .ac-inputcontainer {
+      flex-wrap: wrap;
+      /* Wraps the input container elements to the next line */
+    }
+
+    .ac-card-option {
+      flex: 1 1 45%;
+      /* Sets the flex-grow and flex-shrink properties to 1, and the flex-basis to 45% */
+      max-width: 400px;
+      /* Sets the maximum width of the card option to 400 pixels */
+    }
+  }
+</style>

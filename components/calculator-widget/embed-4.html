@@ -1,0 +1,291 @@
+<script>
+  // Variable to store the partner's birthday in a specific format
+  var partnerBday = undefined;
+
+  // Asynchronous function to start the assessment process
+  async function startAssessment(payload) {
+    // Show the loading indicator while processing
+    var loader = document.querySelector('.ac-loader');
+    loader.style.display = 'block';
+
+    // Hide any existing result elements before displaying new results
+    hideElems(resultElms);
+
+    // Extract the user's birthdate from the payload and split it into day, month, and year
+    var [day, month, year] = payload.family.user.birthdate.split('/');
+
+    // Check if the spouse's age date is provided in the payload
+    if (payload.family.spouse.age_date) {
+      // Split the spouse's age date into day, month, and year
+      let [dayp, monthp, yearp] = payload.family.spouse.age_date.split('/');
+      // Ensure the day is two digits (e.g., '01' instead of '1')
+      if (dayp.length == 1) dayp = '0' + dayp;
+      // Format the partner's birthday as a string
+      partnerBday = dayp + monthp + yearp;
+    }
+
+    // Retrieve the user's gender and smoking status from the payload
+    var gender = payload.family.user.gender;
+    var smoker = payload.family.user.use_tobacco;
+
+    // Display or hide partner breakdown elements based on the presence of spouse's age date
+    if (payload.family.spouse.age_date) {
+      displayElems(document.querySelectorAll('.ac-breakdown-partner'), 'flex');
+    } else {
+      hideElems(document.querySelectorAll('.ac-breakdown-partner'));
+    }
+
+    // Display or hide children breakdown elements based on the number of children
+    if (payload.family.children.length) {
+      displayElems(document.querySelectorAll('.ac-breakdown-children'), 'flex');
+    } else {
+      hideElems(document.querySelectorAll('.ac-breakdown-children'));
+    }
+
+    // Set up headers for API requests
+    const headers = {
+      "Content-Type": "application/json",
+      "x-tenant-id": "23dad38d-f5ad-4703-8ec0-9276d8bcf4a3"
+    };
+
+    // Make a POST request to fetch household information
+    const householdReq = await fetch(`${urlPrefix}/api/global-main/v1/household_infos`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ application_language: "fr-CA" })
+    });
+    // Parse the response to get household information
+    var householdInfo = await householdReq.json();
+    const householdId = householdInfo.data.hh_info_id;
+
+    // Make a POST request to create a life session
+    const lifeSessionReq = await fetch(`${urlPrefix}/api/life-main/v3/life_sessions`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(householdInfo.data)
+    });
+    // Parse the response to get session information
+    const sessionInfo = await lifeSessionReq.json();
+    const sessionId = sessionInfo.data.session_id;
+
+    // Update household information with the provided payload
+    const updateHouseholdReq = await fetch(`${urlPrefix}/api/global-main/v1/household_infos/${householdId}/0`, {
+      method: "PUT",
+      headers,
+      body: JSON.stringify(payload)
+    });
+
+    // Fetch expenses related to the life session
+    const expenseReq = await fetch(`${urlPrefix}/api/life-main/v3/life_sessions/${sessionId}/0/expenses`, {
+      method: "POST",
+      headers
+    });
+    const expenses = await expenseReq.json();
+
+    // Check if education coverage is selected
+    var covEducation = !!document.querySelector('#covEducation-Y.active');
+    // Display or hide education breakdown elements based on coverage selection
+    covEducation ? displayElems(document.querySelectorAll(".ac-breakdown-education"), "flex") : hideElems(document.querySelectorAll(".ac-breakdown-education"));
+
+    // Add an event listener for sending email if not already added
+    eventListenerAdded || (document.querySelector(".ac-email-send").addEventListener("click", function () {
+      submitEmail(householdId, sessionId, document.querySelector("#rec-email").value);
+    }), eventListenerAdded = 1);
+
+    // Send a PATCH request to update education coverage in the life session
+    const patchEducation = await fetch(`${urlPrefix}/api/life-main/v3/life_sessions/${sessionId}/0`, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify({ cover_education: covEducation })
+    });
+
+    // Fetch coverages related to the life session
+    const covReq = await fetch(`${urlPrefix}/api/life-main/v3/life_sessions/${sessionId}/0/coverages`, {
+      method: "POST",
+      headers
+    });
+    const cov = await covReq.json();
+    const options = cov.data.options;
+
+    // Check if there are valid options for coverage
+    if (options && options[0].amt > 0) {
+      // Extract coverage amounts and terms from the options
+      const lw_amt = options[0].lower_cov_amt;
+      const md_amt = options[0].amt;
+      const hg_amt = options[0].higher_cov_amt;
+      const term = options[0].term || cov.data.term;
+
+      // Construct query parameters for fetching quotes
+      let queryParams = `term=${term}&birthday=${day}&birthmon=${month}&birthyr=${year}&gender=${gender}&is_smoker=${smoker == true ? 'Y' : 'N'}&is_joint=false`;
+      if (partnerBday) queryParams = 'partner_birthdate=' + partnerBday + '&' + queryParams;
+
+      // Fetch recommended quotes based on the coverage amount
+      const getQuoteRcmd = await fetch(`${urlPrefix}/api/life-quotes/v2/quotes?amt=${md_amt}&${queryParams}`, {
+        method: "GET",
+        headers
+      });
+      const quotesMd = await getQuoteRcmd.json();
+
+      // Update the life session with the recommended premiums
+      const patchRcmd = await fetch(`${urlPrefix}/api/life-main/v3/life_sessions/${sessionId}/0`, {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify({
+          "recmd_mn_prems": quotesMd.data.primary[0].original_mn_prems,
+          "recmd_yr_prems": quotesMd.data.primary[0].original_yr_prems
+        })
+      });
+
+      // Adjust the position of the calculated image
+      calculatedImg.style.top = '100px';
+
+      // Extract various financial breakdowns from the options
+      var debts = (options[0].extra_fields.breakdown.total_debts || options[0].extra_fields.breakdown.debts) ?? 0;
+      var kids_expenses = options[0].extra_fields.breakdown.kids_expenses ?? 0;
+      var kids_education_costs = options[0].extra_fields.breakdown.kids_education_costs ?? 0;
+      var spouse_expenses = options[0].extra_fields.breakdown.spouse_expenses ?? 0;
+      var total_savings = options[0].extra_fields.breakdown.total_savings ?? 0;
+      var spouse_future_income = options[0].extra_fields.breakdown.spouse_future_income ?? 0;
+      var existing_coverage = options[0].extra_fields.breakdown.existing_coverage ?? 0;
+
+      // Update the breakdown elements with formatted currency values
+      breakdowns[0].innerText = formatCurrency(debts);
+      breakdowns[1].innerText = formatCurrency(kids_expenses);
+      breakdowns[2].innerText = formatCurrency(kids_education_costs);
+      breakdowns[3].innerText = formatCurrency(spouse_expenses);
+      breakdowns[4].innerText = '(' + formatCurrency(total_savings) + ')';
+      breakdowns[5].innerText = '(' + formatCurrency(spouse_future_income) + ')';
+      breakdowns[6].innerText = '(' + formatCurrency(existing_coverage) + ')';
+
+      // Define keys for financial breakdowns
+      var keys = ['total_debts', 'kids_expenses', 'kids_education_costs', 'spouse_expenses', 'total_savings', 'spouse_future_income', 'existing_coverage'];
+
+      // Hide children breakdown if there are no kids expenses
+      if (!options[0].extra_fields.breakdown.hasOwnProperty('kids_expenses')) {
+        hideElems(document.querySelectorAll('.ac-breakdown-children'));
+      }
+
+      // Hide education breakdown if there are no education costs
+      if (!options[0].extra_fields.breakdown.hasOwnProperty('kids_education_costs')) {
+        hideElems(document.querySelectorAll('.ac-breakdown-education'));
+      }
+
+      // Update the partner expenses text based on the presence of children
+      var partnerExp = document.querySelector('.ac-breakdown-expense .ac-table-text');
+      if (payload.family.children.length) {
+        partnerExp.innerText = "Dépenses futures de la famille"; // Future family expenses
+      } else {
+        partnerExp.innerText = "Dépenses du partenaire à vie"; // Partner's lifetime expenses
+      }
+
+      // Hide partner breakdown if there is no future income for the spouse
+      if (!options[0].extra_fields.breakdown.hasOwnProperty('spouse_future_income')) {
+        hideElems(document.querySelectorAll('.ac-breakdown-partner'));
+      } else {
+        displayElems(document.querySelectorAll('.ac-breakdown-partner'), 'flex');
+      }
+
+      // Calculate the total sum of expenses and savings
+      var sum = debts + kids_expenses + kids_education_costs + spouse_expenses - total_savings - spouse_future_income - existing_coverage;
+      document.querySelector(".total-sum").textContent = formatCurrency(sum);
+
+      // Check if the main coverage amount is valid and adjust the display accordingly
+      if (md_amt && (!lw_amt && !hg_amt)) {
+        loader.style.display = 'none'; // Hide loader
+        displayElems(resultElms); // Show result elements
+        hideElems(notNeededElms); // Hide unnecessary elements
+        hideElems(neededElms); // Hide needed elements
+        hideElems(rcmdMsgs); // Hide recommendation messages
+        displayElems(moreNeededElms); // Show more needed elements
+        displayElems(saveEmail, 'flex'); // Show email save option
+
+        // Update the price message with the formatted amount
+        document.querySelector(".ac-message-price").textContent = md_amt.toLocaleString('fr-CA', { style: 'currency', currency: 'CAD', minimumFractionDigits: 0 });
+
+        // Prepare the quote button with the appropriate query parameters
+        var getQuoteBtn = document.querySelector('.ac-see-quotes');
+        let quoteQP = `${urlApp}cov_amt=${md_amt}&override_amt=${md_amt}&term=15&email_ref_v0=1&gender=${gender === 'Male' ? 'M' : 'F'}&smoker=${smoker}&birthdate=${formatDay(day)}${month}${year}&life_session_id=${sessionId}&life_session_id_vers=0&household_id=${householdId}&household_id_vers=0&province=${province}&partner=false`;
+        if (partnerBday) quoteQP = 'partner_birthdate=' + partnerBday + '&' + quoteQP;
+        getQuoteBtn.href = quoteQP; // Set the href for the quote button
+        return; // Exit the function
+      } else {
+        // Handle lower coverage amount if applicable
+        if (lw_amt) {
+          const getQuoteLw = await fetch(`${urlPrefix}/api/life-quotes/v2/quotes?amt=${lw_amt}&${queryParams}`, {
+            method: "GET",
+            headers
+          });
+          const quotesLw = await getQuoteLw.json();
+          monthlyPrices[0].innerText = formatCurrency(quotesLw.data.primary[0].mn_prems); // Update monthly price for lower coverage
+          optionPrices[0].innerText = formatCurrency(lw_amt); // Update option price for lower coverage
+          radioOptions[0].style.display = 'block'; // Show radio option for lower coverage
+        } else {
+          radioOptions[0].style.display = 'none'; // Hide radio option if no lower coverage
+        }
+
+        // Handle higher coverage amount if applicable
+        if (hg_amt) {
+          const getQuoteHg = await fetch(`${urlPrefix}/api/life-quotes/v2/quotes?amt=${hg_amt}&${queryParams}`, {
+            method: "GET",
+            headers
+          });
+          const quotesHg = await getQuoteHg.json();
+          monthlyPrices[2].innerText = formatCurrency(quotesHg.data.primary[0].mn_prems); // Update monthly price for higher coverage
+          optionPrices[2].innerText = formatCurrency(hg_amt); // Update option price for higher coverage
+          radioOptions[2].style.display = 'block'; // Show radio option for higher coverage
+        } else {
+          radioOptions[2].style.display = 'none'; // Hide radio option if no higher coverage
+        }
+
+        // Display the results and update prices for the main coverage
+        displayElems(resultElms);
+        monthlyPrices[1].innerText = quotesMd.data.primary[0].mn_prems.toLocaleString('fr-CA', { style: 'currency', currency: 'CAD' }); // Update monthly price for main coverage
+        optionPrices[1].innerText = formatCurrency(md_amt); // Update option price for main coverage
+
+        // Update the terms for each option
+        for (var ot of optionTerms) {
+          ot.innerText = `${term} years`; // Set the term for each option
+        }
+
+        // Hide the loader and display the results
+        loader.style.display = 'none';
+        displayElems(resultElms);
+        hideElems(notNeededElms);
+        hideElems(moreNeededElms);
+        displayElems(neededElms);
+        displayElems(saveEmail, 'flex');
+        displayElems(rcmdMsgs, 'inline-block');
+
+        // Update recommendation messages with the formatted amount
+        rcmdMsgs[0].textContent = rcmdMsgs[0].textContent.replace('placeholder', md_amt.toLocaleString('fr-CA', { style: 'currency', currency: 'CAD', minimumFractionDigits: 0 }));
+
+        // Construct the query parameters for submitting quotes
+        let quoteQueryParam = `term=${term}&gender=${gender === 'Male' ? 'M' : 'F'}&smoker=${smoker}&birthdate=${formatDay(day)}${month}${year}&life_session_id=${sessionInfo.data.session_id}&life_session_id_vers=0&household_id=${householdInfo.data.hh_info_id}&household_id_vers=0&province=${province}&partner=false`;
+        if (partnerBday) quoteQueryParam = 'partner_birthdate=' + partnerBday + '&' + quoteQueryParam;
+
+        // Set the href for the quote submission links
+        submitElms = document.querySelectorAll("a.ac-customize-quote");
+        submitElms[0].href = urlApp + `cov_amt=${lw_amt}&override_amt=${lw_amt}&email_ref_v0=1&${quoteQueryParam}`;
+        submitElms[1].href = urlApp + `cov_amt=${md_amt}&override_amt=${md_amt}&email_ref_v0=1&${quoteQueryParam}`;
+        submitElms[2].href = urlApp + `cov_amt=${hg_amt}&override_amt=${hg_amt}&email_ref_v0=1&${quoteQueryParam}`;
+
+        // Trigger a click on the "just right" label to finalize the selection
+        document.getElementById("just-right-label").click();
+      }
+    } else {
+      // If no valid options are available, hide the loader and display the results
+      loader.style.display = 'none';
+      displayElems(resultElms);
+      hideElems(rcmdMsgs);
+      hideElems(neededElms);
+      hideElems(moreNeededElms);
+      hideElems(saveEmail);
+      displayElems(notNeededElms); // Show not needed elements
+      calculatedImg.style.top = 'auto'; // Reset the position of the calculated image
+
+      // Prepare the quote button with zero coverage
+      var getQuoteBtn = document.querySelector('.ac-see-quotes');
+      getQuoteBtn.href = urlApp + `cov_amt=0&override_amt=0&term=&email_ref_v0=1&gender=${gender === 'Male' ? 'M' : 'F'}&smoker=${smoker}&birthdate=${formatDay(day)}${month}${year}&life_session_id=${sessionInfo.data.session_id}&life_session_id_vers=0&household_id=${householdInfo.data.hh_info_id}&household_id_vers=0&province=${province}&partner=false`;
+    }
+  }
+</script>

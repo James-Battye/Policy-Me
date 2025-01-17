@@ -1,0 +1,368 @@
+<script>
+  // Select all option groups from the DOM that have the class 'ac-card-option'
+  var optionGroups = document.querySelectorAll(
+    ".ac-card-option"
+  );
+  // Select all buttons for customizing quotes
+  var covCustomizeBtns = document.querySelectorAll(".ca-customize-quote");
+
+  // Function to calculate the birthdate based on the provided year
+  function calculateBirthdate(year) {
+    const currentDate = new Date(); // Get the current date
+    const currentYear = currentDate.getFullYear(); // Extract the current year
+    const birthYear = currentYear - year; // Calculate the birth year
+    // Create a new date object for the birthdate at 7 AM on the birth date
+    const birthdate = new Date(birthYear, currentDate.getMonth(), currentDate.getDate(), 7, 0, 0);
+    return birthdate.toISOString(); // Return the birthdate in ISO format
+  }
+
+  // Function to create an array of children objects with their birthdates
+  function createChildrenArray(children) {
+    if (!children) return []; // Return an empty array if no children are provided
+    return children.map(year => {
+      return {
+        birthdate: calculateBirthdate(year) // Map each year to an object with the calculated birthdate
+      };
+    });
+  }
+
+  // Example array of children ages
+  const children = [3, 4];
+  // Create an array of children objects using the ages
+  const childrenArray = createChildrenArray(children);
+
+  // Iterate over each option group to set up event listeners
+  optionGroups.forEach(function (group, index) {
+    // Select all options within the current group
+    var options = group.querySelectorAll(".rg-container");
+    // Add a click event listener to the group
+    group.addEventListener('click', function () {
+      // Hide all customize buttons
+      for (let btn of covCustomizeBtns) { btn.style.display = 'none' }
+      // Show the button corresponding to the clicked group
+      covCustomizeBtns[index].style.display = 'block';
+    });
+    // Iterate over each option in the group
+    options.forEach(function (option, idx) {
+      // Add a click event listener to each option
+      option.addEventListener("click", function () {
+        // Find the closest parent group of the clicked option
+        var parentGroup = this.closest(".ac-card-option");
+        // Remove the 'selected' class from all option groups
+        document.querySelectorAll(".ac-card-option").forEach(function (div) {
+          div.classList.remove("selected");
+        });
+        // Add the 'selected' class to the clicked option's parent group
+        parentGroup.classList.add("selected");
+      });
+    });
+  });
+
+  // Function to convert a currency string to a numeric value
+  function currencyStringToNumber(currencyString) {
+    var numericString = currencyString.replace(/\D/g, ''); // Remove all non-digit characters
+    var numericValue = parseInt(numericString, 10); // Convert the cleaned string to an integer
+    return numericValue; // Return the numeric value
+  }
+
+  // Function to handle the submission of the recommendation form
+  function submitRecommendationForm() {
+    var totalBalance = null; // Initialize total balance
+    var monthlyMortgage = null; // Initialize monthly mortgage
+    var monthlyRent = null; // Initialize monthly rent
+    childAges = []; // Initialize an array to hold children's ages
+    // Select all error message elements and hide them
+    let errors = document.querySelectorAll(".ac-error-msg");
+    for (e of errors) {
+      e.style.display = "none";
+    }
+    // Get the selected province from the form
+    province = getSelectedProvince();
+    // Check if a partner is selected
+    var isPartnerSelected = document.querySelector('#hasPartner-Y.active') || document.querySelector('#hasPartner-N.active');
+    // Check if children are selected
+    var isChildrenSelected = document.querySelector('#hasChildren-Y.active') || document.querySelector('#hasChildren-N.active');
+    // Check if gender is selected
+    var isGenderSelected = document.querySelector('#gender-M.active') || document.querySelector('#gender-F.active');
+    // Check if nicotine usage is selected
+    var isUsedNicotineSelected = document.querySelector('#usedNicotine-Y.active') || document.querySelector('#usedNicotine-N.active');
+    // Check if housing type is selected (rent or own)
+    var isHouseRentSelected = document.querySelector('#housing-rent.active') || document.querySelector('#housing-own.active');
+
+    // Show error message if partner selection is missing
+    if (!isPartnerSelected) {
+      showErrorMsg(document.querySelector('#hasPartner-Y'))
+    };
+    // Show error message if children selection is missing
+    if (!isChildrenSelected) {
+      showErrorMsg(document.querySelector('#hasChildren-Y'))
+    };
+
+    var errorIndices = []; // Array to hold indices of errors found in children's ages
+    // If children are selected and the 'hasChildren-Y' option is active
+    if (isChildrenSelected && document.querySelector('#hasChildren-Y.active')) {
+      // Select all input elements for children's ages
+      var inputElements = document.querySelectorAll('.ac-children input.input-age');
+      // Iterate over each input element to validate age
+      inputElements.forEach(function (input, index) {
+        var value = parseInt(input.value); // Parse the input value as an integer
+        if (isNaN(value)) {
+          errorIndices.push(index); // If the value is not a number, add the index to errorIndices
+        } else {
+          childAges.push(value); // Otherwise, add the value to childAges
+        }
+      });
+      // If no ages are provided or there are errors, show error messages
+      if (childAges.length == 0 || errorIndices.length > 0) {
+        errorIndices.forEach(function (index) {
+          showErrorMsg(inputElements[index]); // Show error message for each invalid input
+        });
+      }
+    } else {
+      childAges = []; // Reset childAges if no children are selected
+      errorIndices = []; // Reset errorIndices
+    }
+
+    // If children are selected and the 'hasChildren-Y' option is active
+    if (isChildrenSelected && document.querySelector('#hasChildren-Y.active')) {
+      // Check if education coverage is selected
+      var isEducationSelected = document.querySelector('#covEducation-Y.active') || document.querySelector('#covEducation-N.active');
+      if (!isEducationSelected) showErrorMsg(document.querySelector('#covEducation-Y')); // Show error if education selection is missing
+    }
+    // Show error if gender selection is missing
+    if (!isGenderSelected) {
+      showErrorMsg(document.querySelector('#gender-M'))
+    }
+    // Show error if nicotine usage selection is missing
+    if (!isUsedNicotineSelected) {
+      showErrorMsg(document.querySelector('#usedNicotine-Y'))
+    }
+    // Show error if housing type selection is missing
+    if (!isHouseRentSelected) {
+      showErrorMsg(document.querySelector('#housing-rent'));
+    }
+    // If housing type is selected as rent
+    if (isHouseRentSelected) {
+      if (houseRent == 'rent') {
+        var monthlyRentElm = document.querySelector("#Monthly-rent"); // Select the monthly rent input
+        if (!monthlyRentElm.value) {
+          showErrorMsg(monthlyRentElm); // Show error if the input is empty
+        } else {
+          monthlyRent = currencyStringToNumber(monthlyRentElm.value); // Convert the rent input to a numeric value
+        }
+      } else {
+        // If housing type is not rent, check for mortgage inputs
+        var totalAmtElm = document.querySelector("#total-balance"); // Select total balance input
+        var monthlyMortgageElm = document.querySelector("#monthly-mortgage"); // Select monthly mortgage input
+        if (!totalAmtElm.value || (totalAmtElm.value && totalAmtElm.value === '$')) {
+          showErrorMsg(totalAmtElm); // Show error if total balance input is empty or invalid
+        }
+        if (!monthlyMortgageElm.value || (monthlyMortgageElm.value && monthlyMortgageElm.value === '$')) {
+          showErrorMsg(monthlyMortgageElm); // Show error if monthly mortgage input is empty or invalid
+        }
+        // If both total balance and monthly mortgage inputs are valid, convert them to numeric values
+        if (totalAmtElm.value && monthlyMortgageElm.value) {
+          totalBalance = currencyStringToNumber(totalAmtElm.value);
+          monthlyMortgage = currencyStringToNumber(monthlyMortgageElm.value);
+        }
+      }
+    }
+
+    // Select the income input element and validate it
+    incomeElm = document.querySelector("#income");
+    if (!incomeElm.value || incomeElm.value === '$') {
+      showErrorMsg(incomeElm) // Show error if income input is empty or invalid
+    } else {
+      income = currencyStringToNumber(incomeElm.value); // Convert income input to a numeric value
+    }
+
+    // Select the partner income input element and validate it if a partner is selected
+    partnerIncomeElm = document.querySelector("#partner-income");
+    if (isPartnerSelected && document.querySelector('#hasPartner-Y.active')) {
+      if (!partnerIncomeElm.value || partnerIncomeElm.value === '$') {
+        showErrorMsg(partnerIncomeElm); // Show error if partner income input is empty or invalid
+      } else {
+        partnerIncome = currencyStringToNumber(partnerIncomeElm.value); // Convert partner income input to a numeric value
+      }
+    }
+
+    // Select and validate retirement savings input
+    retirementSVElm = document.querySelector("#retirement-savings");
+    if (!retirementSVElm.value || retirementSVElm.value === '$') {
+      showErrorMsg(retirementSVElm) // Show error if retirement savings input is empty or invalid
+    } else {
+      retirementSavings = currencyStringToNumber(retirementSVElm.value); // Convert retirement savings input to a numeric value
+    }
+
+    // Select and validate other savings input
+    otherSVElm = document.querySelector("#other-savings");
+    if (!otherSVElm.value || otherSVElm.value === '$') {
+      showErrorMsg(otherSVElm) // Show error if other savings input is empty or invalid
+    } else {
+      otherSavings = currencyStringToNumber(otherSVElm.value); // Convert other savings input to a numeric value
+    }
+
+    // Select and validate existing coverage input
+    existingCovElm = document.querySelector("#total-existing-coverage");
+    if (!existingCovElm.value || existingCovElm.value === '$') {
+      showErrorMsg(existingCovElm) // Show error if existing coverage input is empty or invalid
+    } else {
+      existingCov = currencyStringToNumber(existingCovElm.value); // Convert existing coverage input to a numeric value
+    }
+
+    // Select and validate family debt input
+    familyDebtElm = document.querySelector("#non-mortgage-debt");
+    if (!familyDebtElm.value || familyDebtElm.value === '$') {
+      showErrorMsg(familyDebtElm) // Show error if family debt input is empty or invalid
+    } else {
+      familyDebt = currencyStringToNumber(familyDebtElm.value); // Convert family debt input to a numeric value
+    }
+
+    // Get the selected date of birth for the primary user
+    var dobDay = getSelectedDay(0);
+    var dobMonth = getSelectedMonth(0);
+    var dobYear = getSelectedYear(0);
+    var bday = `${dobDay}/${dobMonth}/${dobYear}`; // Format the birthdate
+    var errorMsg = validDateErrorMsg(bday); // Validate the formatted birthdate
+    if (errorMsg) {
+      showErrorMsg(document.querySelector("#primaryDob-day"), errorMsg); // Show error if the birthdate is invalid
+    }
+    // If a partner is selected and has a partner, validate their date of birth
+    if (isPartnerSelected && hasPartner) {
+      var partnerDobDay = getSelectedDay(1);
+      var partnerDobMonth = getSelectedMonth(1);
+      var partnerDobYear = getSelectedYear(1);
+      var pBday = `${partnerDobDay}/${partnerDobMonth}/${partnerDobYear}`; // Format the partner's birthdate
+      var errorMsg2 = validDateErrorMsg(pBday); // Validate the partner's birthdate
+      if (errorMsg2) {
+        showErrorMsg(document.querySelector("#primaryDob-day"), errorMsg2); // Show error if the partner's birthdate is invalid
+      }
+      else {
+        document.cookie = "pm_secondary_dob=" + pBday; // Store the partner's birthdate in a cookie
+      }
+    }
+    // Check for any visible error messages
+    var errorMessages = document.querySelectorAll(".ac-error-msg");
+    for (const em of errorMessages) {
+      if (em.style.display === 'block' || em.style.display === 'flex') {
+        scrollToFirstVisibleError(); // Scroll to the first visible error message
+        return; // Exit the function if there are errors
+      }
+    }
+    // Start the assessment process with the collected data
+    startAssessment({
+      family: {
+        children: createChildrenArray(childAges), // Pass the children array
+        spouse: {
+          first_name: null,
+          last_name: null,
+          birthdate: null,
+          age_date: pBday, // Pass the partner's birthdate
+          gender: "Female",
+          retirement_age: null,
+          use_tobacco: null
+        },
+        user: {
+          first_name: null,
+          last_name: null,
+          email: null,
+          phone: null,
+          birthdate: bday, // Pass the user's birthdate
+          gender: gender,
+          health_issues: !1,
+          retirement_age: null,
+          use_tobacco: !1,
+          address_line1: null,
+          address_line2: null,
+          city: null,
+          country: null,
+          postal_code: null,
+          province: province, // Pass the selected province
+          user_family_composition: null
+        }
+      },
+      coverage: {
+        existing: {
+          user: {
+            group: null,
+            individual: existingCov // Pass the existing coverage amount
+          }
+        }
+      },
+      finances: {
+        shared: {
+          assets: {
+            non_retirement: otherSavings, // Pass other savings
+            retirement: retirementSavings // Pass retirement savings
+          },
+          savings_tot_override: null,
+          debts: {
+            credit_cards: null,
+            credit_line: null,
+            home_equity_loans: null,
+            mortgage: totalBalance, // Pass the total mortgage balance
+            other: [{ type: "other1", amount: familyDebt }], // Pass family debt
+            student_loans: null
+          },
+          debts_tot_override: null,
+          expenses: {
+            residence: monthlyMortgage || monthlyRent // Pass either monthly mortgage or rent
+          }
+        },
+        spouse: {
+          income: partnerIncome, // Pass partner's income
+          income_override: null
+        },
+        user: {
+          income: income, // Pass user's income
+          income_override: null
+        },
+        overrides: {
+          savings_tot_override: null,
+          debts_tot_override: null,
+          income_override: null,
+          partner_income_override: null
+        }
+      },
+      coverage: {
+        existing: {
+          user: {
+            group: null,
+            individual: existingCov // Pass the existing coverage amount again
+          }
+        }
+      }
+    });
+  }
+
+  // Event listener for when the DOM content is fully loaded
+  document.addEventListener("DOMContentLoaded", function () {
+    // Select the submit button for the recommendation form
+    submitButton = document.querySelector('.get-recommendation');
+    // Select the original div that displays quotes
+    var originalDiv = document.querySelector('.ac-see-quotes');
+    // Create a new anchor element to replace the original div
+    var newAnchor = document.createElement('a');
+    newAnchor.className = originalDiv.className; // Copy the class name from the original div
+    newAnchor.innerHTML = originalDiv.innerHTML; // Copy the inner HTML from the original div
+    // Replace the original div with the new anchor element
+    originalDiv.parentNode.replaceChild(newAnchor, originalDiv);
+
+    // Select all divs that allow customization of quotes
+    var originalDivs = document.querySelectorAll('.ac-customize-quote');
+    // Iterate over each original div to replace it with an anchor
+    originalDivs.forEach(function (od) {
+      var newAnchor2 = document.createElement('a'); // Create a new anchor element
+      newAnchor2.className = od.className; // Copy the class name from the original div
+      newAnchor2.innerHTML = od.innerHTML; // Copy the inner HTML from the original div
+      // Replace the original div with the new anchor element
+      od.parentNode.replaceChild(newAnchor2, od);
+    });
+
+    // Add a click event listener to the submit button
+    submitButton.addEventListener("click", function () {
+      submitRecommendationForm(); // Call the function to submit the recommendation form
+    });
+  });
+
+</script>

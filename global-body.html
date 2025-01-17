@@ -1,0 +1,159 @@
+<!--Setup for Quebec cookie banner logic-->
+<script>
+  var canonicalTags = document.querySelectorAll('link[rel="canonical"]');
+  if (canonicalTags.length > 1) canonicalTags[0].parentNode.removeChild(canonicalTags[0]);
+</script>
+<script src="https://unpkg.com/@ipregistry/client@5.0.1/dist/browser/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.5/js.cookie.min.js"></script>
+<!--END Setup for Quebec cookie banner logic-->
+
+<!--Script to display cookie popup for quebec residents-->
+<script>
+  let globalUserConsentPromise, globalUserConsentResolve; function createPromise() { return globalUserConsentPromise || (globalUserConsentPromise = new Promise((e, o) => { globalUserConsentResolve = e })), globalUserConsentPromise } async function globalWaitForUserConsent() { try { let e = await createPromise(); return e } catch (o) { console.error(o) } } globalWaitForUserConsent(), $.getJSON("https://api.ipify.org/?format=json", function (e) {
+    let o = new ipregistry.IpregistryClient("yz1d9s83brdbgfiy"), n = Cookies.get("pm_accepted_cookies"), t = new URLSearchParams(window.location.search).get("analytics_location"); "false" === n && ($(".cookie-modal_component").hide(), globalUserConsentResolve(!1)), "true" === n ? (initAnalytics(), $(".cookie-modal_component").hide(), globalUserConsentResolve(!0)) : "unknown" !== n && "false" !== n && o.lookupIp(e.ip).then(n => { "Quebec" === t || "Quebec" === n.data.location.region.name ? Cookies.set("pm_accepted_cookies", "unknown") : (Cookies.set("pm_accepted_cookies", !0), initAnalytics(), $(".cookie-modal_component").hide(), globalUserConsentResolve(!0)) }).catch(error => {
+      if (error && error.message === "Your request origin is not allowed: null") {
+        console.error("Ignoring null origin error:", error);
+      } else if (error.message === "ipregistry is not defined") {
+        const randomNumber = Math.random(); if (randomNumber < 0.2) { throw error; }
+      } else { throw error; }
+    })
+  });
+</script>
+<!--END Script to display cookie popup for quebec residents-->
+
+<!-- queryParamsToCookie, v3, updated Jan 11th, 2024 by Tri Le -->
+<script>
+  globalWaitForUserConsent().then(() => { let t = "true" === Cookies.get("pm_accepted_cookies"); var e = "https://www.policyme.com/api/global-analytics/v1/utm", n = ";domain=.policyme.com;path=/", i = ";expires=Thu, 01 Jan 1970 00:00:01 GMT;", r = new Date; r.setFullYear(r.getFullYear() + 1); var u = ";expires=" + r.toUTCString() + ";", o = {}, m = /\:\/\/dev\./g, a = /\:\/\/test\./g; window.location.href.match(m) && (e = "https://dev.policyme.com/api/global-analytics/v1/utm"), window.location.href.match(a) && (e = "https://test.policyme.com/api/global-analytics/v1/utm"); let c = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content",], l = ["utm_source_first", "utm_medium_first", "utm_campaign_first", "utm_term_first", "utm_content_first",], s = ["sid", "cid", "acid", "clickid", "irclickid",], d = ["https://policyme.com/home", "https://policyme.com/home/", "https://www.policyme.com/home", "https://www.policyme.com/home/", "https://policyme.com", "https://policyme.com/", "https://www.policyme.com", "https://www.policyme.com/",], p = "utm_extras", f = "first_visited_url"; function g(t, e) { let n = !0; return t !== e && (n = !1, null == t && null == e) || n } function $() { return o } function h(t) { document.cookie = "utm_campaign=" + t.utm_campaign + n + (t.utm_campaign ? u : i) + "; secure=true; SameSite=Strict", document.cookie = "utm_content=" + t.utm_content + n + (t.utm_content ? u : i) + "; secure=true; SameSite=Strict", document.cookie = "utm_extras=" + JSON.stringify(t.utm_extras) + n + (t.utm_extras ? u : i) + "; secure=true; SameSite=Strict", document.cookie = "utm_medium=" + t.utm_medium + n + (t.utm_medium ? u : i) + "; secure=true; SameSite=Strict", document.cookie = "utm_source=" + t.utm_source + n + (t.utm_source ? u : i) + "; secure=true; SameSite=Strict", document.cookie = "utm_term=" + t.utm_term + n + (t.utm_term ? u : i) + "; secure=true; SameSite=Strict" } function y(t) { return t.referring_domain = "undefined" != typeof document && document.referrer, t[f] = "undefined" != typeof document && document.location ? document.location.pathname : "", t } function _(t) { let e = {}; for (let n = 0; n < l.length; n++)e[l[n]] = t[c[n]] || void 0; return e[p] = t[p] || void 0, e[f] = t[f] || void 0, e } function v(t, n) { var i = new XMLHttpRequest; i.open("PATCH", e + "/" + t + "/tracking/" + n), i.setRequestHeader("Content-type", "application/json"), i.setRequestHeader("X-tenant-id", "23dad38d-f5ad-4703-8ec0-9276d8bcf4a3"), i.send(JSON.stringify({ current_url: document.location.pathname })) } function b() { window.fbq ? window.fbq("trackCustom", "Unbounce - Landing Page View") : setTimeout(b, 100) } function O() { for (var t = document.cookie.split("; "), e = {}, n = 0; n < t.length; n++) { var i = t[n].split("="); 0 === i[0].trim().indexOf("utm_") && (e[i[0]] = i[1]) } return e } function q() { var t = document.location.search.split("?"); let e = { utm_campaign: null, utm_content: null, utm_extras: null, utm_medium: null, utm_source: null, utm_term: null }; if (t[1]) for (var n = t[1].split("&"), i = 0; i < n.length; i++) { var r = n[i].split("="); 0 === r[0].indexOf("utm_") ? e[r[0]] = r[1] : "grsf" === r[0] ? (e.utm_term = r[1], e.utm_source = "growsurf") : s.indexOf(r[0]) >= 0 && (e[p] = { ...e[p], [r[0]]: r[1] }) } return d.includes(window.location.href) && null === e.utm_source ? e.utm_source = "direct" : t[0].includes("careers") || null !== e.utm_source || (e.utm_source = "seo"), e } function H(t) { let e = { utm_source: "unbounce_undefined" }; return utmParam = q(e = O(e, t)), e } !function i() { try { var r, m, a = document.cookie.split("; "), c = !1; o = { utm_campaign: null, utm_content: null, utm_extras: null, utm_medium: null, utm_source: null, utm_term: null, first_visited_url: null, referring_domain: null }; for (var l = 0; l < a.length; l++) { var s = a[l].split("="); "utm_global_id" === s[0].trim() && s[1] ? (c = !0, r = s[1]) : "utm_tracking_id" === s[0].trim() && s[1] && (m = s[1]) } let d = O(), p = q(); if (c) { if (p.utm_campaign && !g(d.utm_campaign, p.utm_campaign) || p.utm_content && !g(d.utm_content, p.utm_content) || p.utm_extras && !g(d.utm_extras, p.utm_extras) || p.utm_medium && !g(d.utm_medium, p.utm_medium) || p.utm_source && !g(d.utm_source, p.utm_source) || p.utm_term && !g(d.utm_term, p.utm_term)) { if (h(p), t) { o = y(p); var f = new XMLHttpRequest; f.open("POST", e + "/" + r + "/tracking"), f.setRequestHeader("Content-type", "application/json"), f.setRequestHeader("X-tenant-id", "23dad38d-f5ad-4703-8ec0-9276d8bcf4a3"), f.onload = function () { var t = JSON.parse(f.response).data; document.cookie = "utm_tracking_id=" + t.utm_tracking_id + n + u, v(r, t.utm_tracking_id) + "; secure=true; SameSite=Strict" }, f.send(JSON.stringify(o)) } } else t && v(r, m) } else if (h(p), t) { o = y(p); var f = new XMLHttpRequest; f.open("POST", e, !1), f.setRequestHeader("Content-type", "application/json"), f.setRequestHeader("X-tenant-id", "23dad38d-f5ad-4703-8ec0-9276d8bcf4a3"), f.onload = function () { var t = JSON.parse(f.response).data; document.cookie = "utm_global_id=" + t.utm_global_id + n + u + "; secure=true; SameSite=Strict", document.cookie = "utm_tracking_id=" + t.utm_tracking_id + n + u + "; secure=true; SameSite=Strict", v(t.utm_global_id, t.utm_tracking_id) }, f.send(JSON.stringify(o)) } } catch ($) { console.error("unable to set cookies"), console.error($) } try { b() } catch (R) { console.error("unable to send facebook event"), console.error(R) } }() });
+
+  function w(i) { let t = window.location.search, n; n = -1 !== t.indexOf("#") ? t.substring(0, t.indexOf("#")).split("?") : t.split("?"); let s = -1 === i.indexOf("?") ? "?" : "&"; if (n.length > 1 && n[1]) { let e = n[1].split("&"), l = i.indexOf("#"), r = -1 !== l, f = r ? i.substring(0, l).split("?") : i.split("?"), u = f.length > 1 ? f[1].split("&") : [], _ = e.filter(i => !u.includes(i)).join("&"); if (_.length > 0) return r ? i.substring(0, l) + s + _ + i.substring(l) : i + s + _ } return i }
+
+  try { for (var _ = document.getElementsByTagName("a"), H = 0; H < _.length; H++)_[H].href = w(_[H].href) } catch (T) { console.error("unable to update href"), console.error(T) }
+</script>
+<!-- END queryParamsToCookie -->
+
+<!-- loggedIn component -->
+<style>
+  .logged-container {
+    margin-left: -6px;
+
+    @media (min-width: 576px) {
+      margin-left: -2px;
+    }
+  }
+
+  .logged-container .initials {
+    font-family: 'Lato webfont' !important;
+  }
+</style>
+<script type="text/javascript" defer>
+  var Regex = /\:\/\/policyme/g;
+  var wwwRegex = /\:\/\/www\.policyme/g;
+  var scriptSrc;
+
+  if (window.location.href.match(Regex) || window.location.href.match(wwwRegex)) {
+    scriptSrc = 'https://plugins.prod.policyme.com/loggedIn.js';
+  } else {
+    scriptSrc = 'https://plugins.dev.policyme.com/loggedIn.js';
+  }
+
+  var script = document.createElement("script");
+  script.type = "text/javascript";
+  script.src = scriptSrc;
+  script.async = true;
+  document.head.appendChild(script);
+  const lang = window.location.href.includes('fr') ? 'fr-CA' : 'en-CA';
+  document.addEventListener('DOMContentLoaded', () => {
+    const install = () => {
+      if (window.PM && window.PM.loggedInV1 && !window.location.href.includes('affiliate') && !window.location.href.includes('fr/partenaire')) {
+        window.PM.loggedInV1('.login-plugin', { lang: lang, skipConfirmationModal: true, isMenuRelative: true });
+        document.cookie = `lang=${lang}; Domain=${location.hostname}; path=/`;
+        let elements = document.querySelectorAll(".login-plugin");
+        for (element of elements) {
+          element.style.display = "block";
+        }
+      } else {
+        setTimeout(install, 100);
+      }
+    };
+    install();
+  })
+</script>
+<!-- END loggedIn component -->
+
+<!-- HIDE HD pages for affiliate -->
+<script>
+  if (window.location.href.includes('affiliate')) {
+    const toHide = document.querySelectorAll('.hide-affiliate');
+    for (e of toHide) {
+      e.style.display = 'none';
+    }
+  }
+</script>
+
+<!--Replace www. with environment -->
+<script>
+  var anchors = document.getElementsByTagName("a"), iframes = document.getElementsByTagName("iframe"), sendgridDevSrc = "FILL-ME-IN", sendgridTestSrc = "FILL-ME-IN", regex1 = /\:\/\/webflow-preview\./g, regex2 = /\:\/\/dev\./g, regex3 = /\:\/\/test\./g, regex4 = /\:\/\/webflow-blog-preview\./g, regex5 = /\:\/\/eng1\./g, regex6 = /\:\/\/eng2\./g, regex7 = /\:\/\/eng3\./g, regex8 = /\:\/\/pl1\./g, regex9 = /\:\/\/dev-clone\./g, regex10 = /\:\/\/pl2\./g, regex11 = /\:\/\/.*\.ondemand./g, regex12 = /\:\/\/demo\./g; if (window.location.href.match(regex1) || window.location.href.match(regex2) || window.location.href.match(regex4)) { for (var e = 0; e < anchors.length; e++)anchors[e].href = anchors[e].href.replace("www.policyme.com", "dev.policyme.com"); for (var e = 0; e < iframes.length; e++)iframes[e].src = iframes[e].src.replace("www.policyme.com", "dev.policyme.com"), "iframe-sendgrid" === iframes[e].className && (iframes[e].src = sendgridDevSrc) } else if (window.location.href.match(regex9)) { for (var e = 0; e < anchors.length; e++)anchors[e].href = anchors[e].href.replace("www.policyme.com", "dev-clone.policyme.com"); for (var e = 0; e < iframes.length; e++)iframes[e].src = iframes[e].src.replace("www.policyme.com", "dev-clone.policyme.com"), "iframe-sendgrid" === iframes[e].className && (iframes[e].src = sendgridDevSrc) } else if (window.location.href.match(regex3) || window.location.href.match(regex5) || window.location.href.match(regex6) || window.location.href.match(regex7) || window.location.href.match(regex8) || window.location.href.match(regex12) || window.location.href.match(regex10) || window.location.href.match(regex11)) { for (var e = 0; e < anchors.length; e++)anchors[e].href = anchors[e].href.replace("www.policyme.com", window.location.host); for (var e = 0; e < iframes.length; e++)iframes[e].src = iframes[e].src.replace("www.policyme.com", window.location.host), "iframe-sendgrid" === iframes[e].className && (iframes[e].src = sendgridTestSrc) }
+</script>
+<!-- END Replace www. with environment -->
+
+<!-- Accordion JS -->
+<script>
+  const accSettings = { speed: 300, oneOpen: !0, offsetAnchor: !0, offsetFromTop: 180, scrollTopDelay: 400, classes: { accordion: "js-accordion", header: "js-accordion-header", item: "js-accordion-item", body: "js-accordion-body", icon: "js-accordion-icon", active: "active" } }, prefix = accSettings.classes, accordion = function () { let e = $(`.${prefix.accordion}`), i = e.find(`.${prefix.header}`), o = $(`.${prefix.item}`), c = $(`.${prefix.body}`); $(`.${prefix.icon}`); let t = prefix.active; return { init: function (e) { i.on("click", function () { accordion.toggle($(this)), accSettings.offsetAnchor && setTimeout(() => { $("html").animate({ scrollTop: $(this).offset().top - accSettings.offsetFromTop }, accSettings.speed) }, accSettings.scrollTopDelay) }), $.extend(accSettings, e), e.oneOpen && $(`.${prefix.item}.${t}`).length > 1 && $(`.${prefix.item}.${t}:not(:first)`).removeClass(t).find(`.${prefix.header} > .${prefix.icon}`).removeClass(t), $(`.${prefix.item}.${t}`).find(`> .${prefix.body}`).show() }, toggle: function (i) { accSettings.oneOpen && i[0] != i.closest(e).find(`> .${prefix.item}.${t} > .${prefix.header}`)[0] && (i.closest(e).find(`> .${prefix.item}`).removeClass(t).find(c).slideUp(accSettings.speed), i.closest(e).find(`> .${prefix.item}`).find(`> .${prefix.header} > .${prefix.icon}`).removeClass(t)), i.closest(o).toggleClass(`${t}`).find(`> .${prefix.header} > .${prefix.icon}`).toggleClass(t), i.next().stop().slideToggle(accSettings.speed) } } }(); $(document).ready(function () { accordion.init(accSettings) });
+</script>
+<!-- END Accordion JS -->
+
+
+<!-- Navbar Event Tracking Code -->
+<script>
+  function addListeners(e) { e.forEach(function (e) { e.addEventListener("click", function (e) { var a = e.target.innerText; window.analytics && window.analytics.track(`Webflow Nav Bar - ${a}`, { ...utmCookies }) }) }) } window.addEventListener("DOMContentLoaded", function () { var e = document.getElementsByClassName("mainnavbar--policyme"), a = document.getElementsByClassName("mobile-nav-wrapper"); e && e.length > 0 && addListeners(e[0].querySelectorAll("a")), a && a.length > 0 && addListeners(a[0].querySelectorAll("a")) });
+</script>
+<!-- END Navbar Event Tracking Code -->
+
+<!-- Going between English and French pages code -->
+<script>
+  let LANGUAGE_MAPPINGS_FILE_URL = "https://cdn.prod.website-files.com/5f45bde202f25f678554fbe6/6706b06865651a2ce7f1ec1a_Webflow%20Language%20Toggle%20Script%20v.%2010082024%20(1).txt"; fetch(LANGUAGE_MAPPINGS_FILE_URL).then(e => e.text()).then(e => { let t = e.split("\n"); t.shift(); let a = {}, l = {}, n = {}; for (let f of t) english_url_path = (row_split = f.split(","))[0] && row_split[0].trim(), french_url_path = row_split[1] && row_split[1].trim(), a[english_url_path] = french_url_path, a[french_url_path] = english_url_path, l[english_url_path] = !0, n[french_url_path] = !0; $(document).ready(function () { let e = window.location.pathname; a[e] && $(".lang-toggle").attr("href", a[e]); let t = document.createElement("link"); t.rel = "alternate", t.href = `https://${window.location.host}${a[e]}`, l[e] ? (t.hreflang = "fr-CA", $("head").append(t)) : n[e] && (t.hreflang = "en-CA", $("head").append(t)) }) }).catch(e => console.error(e));
+</script>
+<!-- END Going between English and French pages code -->
+
+<!-- Scripts to save accepted cookies value-->
+<script>
+  $(document).on('click', '.cookie-modal_button', function () {
+    const userConsent = true;
+    Cookies.set('pm_accepted_cookies', userConsent);
+    globalUserConsentResolve(userConsent);
+    $(".cookie-modal_component").hide();
+    initAnalytics();
+
+  });
+</script>
+
+<script>
+  $(document).on('click', '.cookiecta', function () {
+    const userConsent = true;
+    Cookies.set('pm_accepted_cookies', userConsent);
+    globalUserConsentResolve(userConsent);
+    $(".cookie-modal_component").hide();
+    initAnalytics();
+
+  });
+</script>
+
+<script>
+  $(document).on('click', '.pm-url', function () {
+    const userConsent = false;
+    Cookies.set('pm_accepted_cookies', userConsent);
+    globalUserConsentResolve(userConsent);
+    $(".cookie-modal_component").hide();
+  });
+</script>
+<!--END Scripts to save accepted cookies value-->
+
+<script>
+  const exceptions = ["life-insurance-cost", "term-length", "dental-insurance-cost", "health-insurance-cost", "vision-insurance-by-province"]; let skipFlag = 0; if (document.querySelector(".breadcrumb-wrapper")) { !function (e, t) { "object" == typeof exports && "object" == typeof module ? module.exports = t() : "function" == typeof define && define.amd ? define([], t) : "object" == typeof exports ? exports["global-libjs-webflow"] = t() : e["global-libjs-webflow"] = t() }(self, () => (() => { let e = JSON.stringify(function (e) { let t = {}, l = e.split("/"), i = { "@context": "https://schema.org/", "@type": "BreadcrumbList", itemListElement: [] }; i.itemListElement.push({ "@type": "ListItem", position: 0, name: "Home", item: "https://www.policyme.com/" }); let n = l[l.length - 1].includes("-page") && l.length >= 4; for (let a = 1; a < l.length; a++) { let c = l[a], s = a, o = t[c] || c && c.split("-").join(" ").replace(/\w\S*/g, function (e) { return e.charAt(0).toUpperCase() + e.substr(1).toLowerCase() }), p = "https://www.policyme.com/" + l.slice(1, a + 1).join("/"); if (exceptions.includes(c)) { skipFlag = 1, "life-insurance-cost" === c ? i.itemListElement.push({ "@type": "ListItem", position: s, name: o.replace(/ Page$/, ""), item: "https://policyme.com" }) : i.itemListElement.push({ "@type": "ListItem", position: s, name: o.replace(/ Page$/, "") }); continue } n && a === l.length - 2 && (p += "-page"), skipFlag && (s -= 1), i.itemListElement.push({ "@type": "ListItem", position: s, name: o.replace(/ Page$/, ""), item: p }) } return i }(window.location.pathname)), t = document.createElement("script"); return t.type = "application/ld+json", t.id = "breadcrumb-json-ld", t.innerHTML = e, document.head.appendChild(t), {} })()); let e = document.querySelector(".breadcrumb-wrapper"); for (; e.firstChild;)e.removeChild(e.firstChild); let t = window.location.origin, l = window.location.pathname.split("/").filter(Boolean), i = l[l.length - 1].includes("-page") && l.length >= 4, n = document.createElement("a"); n.href = t, n.className = "link-block-2 w-inline-block", n.innerHTML = '<div class="breadcrumb-link">Homepage</div>', e.appendChild(n); for (let a = 0; a < l.length; a++) { e.appendChild(document.createTextNode("/ ")); let c = l[a].replace(/-/g, " ").replace(/\b\w/g, e => e.toUpperCase()), s = t + "/" + l.slice(0, a + 1).join("/"); if (i && a === l.length - 2 && (s += "-page"), exceptions.includes(l[a])) { if ("life-insurance-cost" === l[a]) { let o = document.createElement("a"); o.href = "https://www.policyme.com/blog/how-much-does-life-insurance-cost-in-canada", o.className = "link-block-2 w-inline-block"; let p = document.createElement("div"); p.className = "breadcrumb-link", p.textContent = c, o.appendChild(p), e.appendChild(o) } else { let r = document.createElement("div"); r.className = "breadcrumb-text", r.textContent = c, e.appendChild(r) } } else if (a === l.length - 1) { let m = document.createElement("div"); m.className = "text-block-74", m.textContent = c, e.appendChild(m) } else { let d = document.createElement("a"); d.href = s, d.className = "link-block-2 w-inline-block"; let h = document.createElement("div"); h.className = "breadcrumb-link", h.textContent = c, d.appendChild(h), e.appendChild(d) } } }
+</script>
+
+<!--Add queryparam if hyperlink doesn't have it
+  <script>
+    document.addEventListener('DOMContentLoaded',function(){function e(){return window.location.search}function n(e,n){return e.includes("?")?e:e+n}const t=e();if(!t)return;document.querySelectorAll("a").forEach(e=>{const o=e.getAttribute("href");if(o&&!o.includes("?")){const r=n(o,t);e.setAttribute("href",r)}})});
+  </script>
+  -->

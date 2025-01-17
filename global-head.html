@@ -1,0 +1,173 @@
+< !--Add Sentry-->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.Sentry) {
+        Sentry.init({
+          dsn: 'https://f3062de06f51486996ec961a7e2de940@o183124.ingest.us.sentry.io/4505550882865152',
+          sampleRate: 0.3,
+        });
+      }
+    });
+  </script>
+  <script src="https://js.sentry-cdn.com/f3062de06f51486996ec961a7e2de940.min.js" crossorigin="anonymous"
+    async></script>
+  <!--End adding Sentry-- >
+
+< !--commenting out as jquery 3.5.1 is provided
+-->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <style>
+    .w-webflow-badge {
+      display: none !important;
+    }
+
+    .js-accordion-body {
+      display: none;
+    }
+  </style>
+
+  <link rel="preconnect" href="https://global-uploads.webflow.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://connect.facebook.net">
+
+
+  <!-- Script to initialize analytics -->
+  <!-- Source: global-tools-development/js/addAllAnalytics.js -->
+  <script>
+    // Segment
+    let utm_fields = ['utm_content', 'utm_medium', 'utm_name', 'utm_source', 'utm_term', 'utm_campaign'];
+    const searchParams = new URLSearchParams(window.location.search);
+    function getCookiesStartingWith(prefix) {
+      var cookies = document.cookie.split(';').map(cookie => cookie.trim());
+      var filteredCookies = cookies.filter(cookie => cookie.startsWith(prefix));
+      var cookieObject = {};
+      for (let field of utm_fields) { if (searchParams.get(field)) cookieObject[field] = searchParams.get(field) }
+      filteredCookies.forEach(cookie => {
+        var [name, value] = cookie.split('=');
+        if (utm_fields.includes(name))
+          cookieObject[name.trim()] = decodeURIComponent(value);
+      });
+      return cookieObject;
+    }
+    var utmCookies = getCookiesStartingWith('utm');
+    function initSegment() {
+      !function () { let e = window.location.href, t = new URL(e), a = t.hostname, n = a.split(".")[0], i = n.includes("dev"), r = "POLICYME", o = (i ? { POLICYME: "QqrFZgjuzqIbSqedhsqm8NnzDjywdQwO" } : { POLICYME: "9yU9AEKQBMpgTbX0pRHo8fdtUMipQPHA" }).POLICYME; console.log(i, r, "", o), function () { var e = window.analytics = window.analytics || []; if (!e.initialize) { if (e.invoked) window.console && console.error && console.error("Segment snippet included twice."); else { e.invoked = !0, e.methods = ["trackSubmit", "trackClick", "trackLink", "trackForm", "pageview", "identify", "reset", "group", "track", "ready", "alias", "debug", "page", "once", "off", "on", "addSourceMiddleware", "addIntegrationMiddleware", "setAnonymousId", "addDestinationMiddleware"], e.factory = function (t) { return function () { if (window.analytics.initialized) return window.analytics[t].apply(window.analytics, arguments); var a = Array.prototype.slice.call(arguments); return a.unshift(t), e.push(a), e } }; for (var t = 0; t < e.methods.length; t++) { var a = e.methods[t]; e[a] = e.factory(a) } e.load = function (t, a) { var n = document.createElement("script"); n.type = "text/javascript", n.async = !0, n.src = "https://cdn.segment.com/analytics.js/v1/" + t + "/analytics.min.js"; var i = document.getElementsByTagName("script")[0]; i.parentNode.insertBefore(n, i), e._loadOptions = a }, e._writeKey = o, e.SNIPPET_VERSION = "4.16.1", e.load(o), e.page({ ...utmCookies, tenant: r, tenant_suborganization: "", tenant_id: "23dad38d-f5ad-4703-8ec0-9276d8bcf4a3" }) } } }() }();
+    }
+
+
+    function initDatawarehouse() {
+      (function (w, d) {
+        var id = 'pdst-capture', n = 'script';
+        if (!d.getElementById(id)) {
+          w.pdst = w.pdst || function () { (w.pdst.q = w.pdst.q || []).push(arguments); };
+          var e = d.createElement(n); e.id = id; e.async = 1;
+          e.src = 'https://cdn.pdst.fm/ping.min.js';
+          var s = d.getElementsByTagName(n)[0];
+          s.parentNode.insertBefore(e, s);
+        }
+        w.pdst('conf', { key: '1884f83ab1c741e597d6f68b42912fab' });
+        w.pdst('view');
+      })(window, document);
+    }
+
+    function initFB() {
+      !function (e, t, n, c, o, a, f) { e.fbq || (o = e.fbq = function () { o.callMethod ? o.callMethod.apply(o, arguments) : o.queue.push(arguments) }, e._fbq || (e._fbq = o), o.push = o, o.loaded = !0, o.version = "2.0", o.queue = [], (a = t.createElement(n)).async = !0, a.src = "https://connect.facebook.net/en_US/fbevents.js", (f = t.getElementsByTagName(n)[0]).parentNode.insertBefore(a, f)) }(window, document, "script"), fbq("init", "2252185018335717"), fbq("track", "PageView");
+    }
+
+    function initAnalytics() {
+      initSegment();
+      initDatawarehouse();
+      initFB();
+    }</script>
+  <!-- End script to initialize analytics -->
+
+  <!-- Start VWO Async SmartCode -->
+  <link rel="preconnect" href="https://dev.visualwebsiteoptimizer.com" />
+  <script type='text/javascript' id='vwoCode'>
+    if (window.localStorage && window.sessionStorage) {
+      window._vwo_code || (function () {
+        var account_id = 857937,
+          version = 2.1,
+          settings_tolerance = 2000,
+          hide_element = 'body',
+          hide_element_style = 'opacity:0 !important;filter:alpha(opacity=0) !important;background:none !important',
+          /* DO NOT EDIT BELOW THIS LINE */
+          f = false, w = window, d = document, v = d.querySelector('#vwoCode'), cK = '_vwo_' + account_id + '_settings', cc = {}; try { var c = JSON.parse(localStorage.getItem('_vwo_' + account_id + '_config')); cc = c && typeof c === 'object' ? c : {} } catch (e) { } var stT = cc.stT === 'session' ? w.sessionStorage : w.localStorage; code = { use_existing_jquery: function () { return typeof use_existing_jquery !== 'undefined' ? use_existing_jquery : undefined }, library_tolerance: function () { return typeof library_tolerance !== 'undefined' ? library_tolerance : undefined }, settings_tolerance: function () { return cc.sT || settings_tolerance }, hide_element_style: function () { return '{' + (cc.hES || hide_element_style) + '}' }, hide_element: function () { if (performance.getEntriesByName('first-contentful-paint')[0]) { return '' } return typeof cc.hE === 'string' ? cc.hE : hide_element }, getVersion: function () { return version }, finish: function (e) { if (!f) { f = true; var t = d.getElementById('_vis_opt_path_hides'); if (t) t.parentNode.removeChild(t); if (e) (new Image).src = 'https://dev.visualwebsiteoptimizer.com/ee.gif?a=' + account_id + e } }, finished: function () { return f }, addScript: function (e) { var t = d.createElement('script'); t.type = 'text/javascript'; if (e.src) { t.src = e.src } else { t.text = e.text } d.getElementsByTagName('head')[0].appendChild(t) }, load: function (e, t) { var n = this.getSettings(), i = d.createElement('script'), r = this; t = t || {}; if (n) { i.textContent = n; d.getElementsByTagName('head')[0].appendChild(i); if (!w.VWO || VWO.caE) { stT.removeItem(cK); r.load(e) } } else { var o = new XMLHttpRequest; o.open('GET', e, true); o.responseType = t.responseType || 'text'; o.onload = function () { if (t.onloadCb) { return t.onloadCb(o, e) } if (o.status === 200) { _vwo_code.addScript({ text: o.responseText }) } else { _vwo_code.finish('&e=loading_failure:' + e) } }; o.onerror = function () { if (t.onerrorCb) { return t.onerrorCb(e) } _vwo_code.finish('&e=loading_failure:' + e) }; o.send() } }, getSettings: function () { try { var e = stT.getItem(cK); if (!e) { return } e = JSON.parse(e); if (Date.now() > e.e) { stT.removeItem(cK); return } return e.s } catch (e) { return } }, init: function () { if (d.URL.indexOf('__vwo_disable__') > -1) return; var e = this.settings_tolerance(); w._vwo_settings_timer = setTimeout(function () { _vwo_code.finish(); stT.removeItem(cK) }, e); var t; if (this.hide_element() !== 'body') { t = d.createElement('style'); var n = this.hide_element(), i = n ? n + this.hide_element_style() : '', r = d.getElementsByTagName('head')[0]; t.setAttribute('id', '_vis_opt_path_hides'); v && t.setAttribute('nonce', v.nonce); t.setAttribute('type', 'text/css'); if (t.styleSheet) t.styleSheet.cssText = i; else t.appendChild(d.createTextNode(i)); r.appendChild(t) } else { t = d.getElementsByTagName('head')[0]; var i = d.createElement('div'); i.style.cssText = 'z-index: 2147483647 !important;position: fixed !important;left: 0 !important;top: 0 !important;width: 100% !important;height: 100% !important;background: white !important;'; i.setAttribute('id', '_vis_opt_path_hides'); i.classList.add('_vis_hide_layer'); t.parentNode.insertBefore(i, t.nextSibling) } var o = 'https://dev.visualwebsiteoptimizer.com/j.php?a=' + account_id + '&u=' + encodeURIComponent(d.URL) + '&vn=' + version; if (w.location.search.indexOf('_vwo_xhr') !== -1) { this.addScript({ src: o }) } else { this.load(o + '&x=true') } } }; w._vwo_code = code; code.init();
+      })();
+    }
+  </script>
+  <!-- End VWO Async SmartCode -->
+
+  <style>
+    @media screen and (max-width: 991px) {
+      .w-nav-overlay {
+        display: none !important;
+      }
+
+      .body>* {
+        transition: all 0.6s ease-in-out;
+        left: 0;
+      }
+
+      .body>*:not(.nav-cookiewrapper) {
+        position: relative;
+      }
+
+      .body-nav-active>* {
+        left: 20rem !important;
+        position: relative !important;
+        transition: all 0.6s ease-in-out;
+      }
+    }
+
+    @media screen and (max-width: 479px) {
+      .body-nav-active {
+        position: fixed;
+      }
+
+      .mobile-subnav-menu {
+        height: 100vh;
+        overflow: scroll;
+      }
+
+      .mobile-childnav-menu {
+        height: 100vh;
+        overflow: scroll;
+      }
+
+      .w-nav-overlay {
+        display: none !important;
+      }
+
+      .body-nav-active.body-nav-active>* {
+        left: 18rem !important;
+      }
+    }
+
+    .body-nav-active .mobile-toc-2 {
+      position: relative !important;
+      top: 0px !important;
+    }
+
+    .mobile-toc-2 {
+      position: sticky !important;
+    }
+
+    .breadcrumb-text {
+      margin-left: 4px;
+      margin-right: 4px;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+
+  <script src="https://analytics.ahrefs.com/analytics.js" data-key="ghW8s5ijSVQ8U0ylZAtVhA" defer="true"></script>

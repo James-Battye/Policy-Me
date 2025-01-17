@@ -1,0 +1,11 @@
+<script>
+  const wrappers = document.querySelectorAll('.interlink-wrapper');
+  for (wrapper of wrappers) {
+    let links = wrapper.getElementsByTagName('a');
+    for (let i = 0; i < links.length; i++) {
+      links[i].addEventListener('click', function (event) {
+        window.analytics && window.analytics.track(`Webflow Inter Link - ${this.textContent}`, { ...utmCookies })
+      });
+    }
+  }
+</script>

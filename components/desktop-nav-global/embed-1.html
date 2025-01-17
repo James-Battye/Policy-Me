@@ -1,0 +1,57 @@
+<style>
+  .navbarmenu.active {
+    border-bottom: solid 2px #89D6EC;
+  }
+
+  .link-with-submenu.active {
+    background: #fcf2e8;
+  }
+
+  .navbody a.w--current {
+    background-color: transparent;
+    border: none;
+  }
+</style>
+<script>
+  var itemName = '';
+  document.addEventListener('DOMContentLoaded', () => {
+    const navItems = document.querySelectorAll('.navlist .navbarmenu');
+    const linkWithSubMenu = document.querySelectorAll('.link-with-submenu');
+    const navBody = document.querySelector('.navbody');
+    navBody.style.display = 'none';
+    const container = document.querySelector('.desktop-navbar');
+    navItems.forEach(item => {
+      item.addEventListener('mouseenter', () => {
+        setTimeout(() => {
+          navBody.style.display = 'flex';
+        }, 10);
+        navItems.forEach(nav => nav.classList.remove('active'));
+        item.classList.add('active');
+        itemName = item.id.replace('nav-', '');
+        const firstColumn = document.querySelector(`#menu-${itemName}`);
+        const allFirstColumns = document.querySelectorAll('.first-level-group');
+        allFirstColumns.forEach(col => col.style.display = "none");
+        firstColumn.style.display = "flex";
+        const allSecondColWrappers = document.querySelectorAll('.second-level-wrapper');
+        allSecondColWrappers.forEach(wrapper => wrapper.style.display = "none");
+      });
+    });
+    linkWithSubMenu.forEach(item => {
+      item.addEventListener('mouseenter', () => {
+        document.querySelector(`.second-level-${itemName}`).style.display = "flex";
+        linkWithSubMenu.forEach(nav => nav.classList.remove('active'));
+        item.classList.add('active');
+        const subMenuActive = item.textContent.toLowerCase().replace(/\s+/g, '-');
+        document.querySelectorAll('.second-level-group').forEach(col => col.style.display = "none");
+        document.querySelector(`#${subMenuActive}`).style.display = "flex";
+      });
+    });
+    container.addEventListener('mouseleave', () => {
+      setTimeout(() => {
+        navBody.style.display = 'none';
+
+      }, 300);
+    });
+  });
+
+</script>

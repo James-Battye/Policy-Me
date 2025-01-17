@@ -1,0 +1,374 @@
+<style>
+  /* The .nice-select class styles a custom dropdown select element */
+  .nice-select {
+    background-color: #fff;
+    /* Sets the background color to white */
+    border: solid 1px #ccc;
+    /* Sets a 1px solid border with a light gray color */
+    box-sizing: border-box;
+    /* Includes padding and border in the element's total width and height */
+    clear: both;
+    /* Clears any floats on both sides */
+    cursor: pointer;
+    /* Changes the cursor to a pointer when hovering over the element */
+    color: #888;
+    /* Sets the text color to a light gray */
+    display: block;
+    /* Displays the element as a block-level element */
+    font-family: inherit;
+    /* Inherits the font family from the parent element */
+    font-size: 16px;
+    /* Sets the font size to 16 pixels */
+    font-weight: normal;
+    /* Sets the font weight to normal */
+    height: 42px;
+    /* Sets the height of the element to 42 pixels */
+    line-height: 40px;
+    /* Sets the line height to 40 pixels */
+    outline: none;
+    /* Removes the default outline when the element is focused */
+    padding-left: 18px;
+    /* Adds 18 pixels of padding to the left side */
+    padding-right: 30px;
+    /* Adds 30 pixels of padding to the right side */
+    position: relative;
+    /* Sets the positioning context to relative */
+    text-align: left !important;
+    /* Aligns the text to the left and overrides any other text alignment */
+    -webkit-user-select: none;
+    /* Disables text selection for WebKit-based browsers */
+    -moz-user-select: none;
+    /* Disables text selection for Mozilla-based browsers */
+    -ms-user-select: none;
+    /* Disables text selection for Microsoft browsers */
+    user-select: none;
+    /* Disables text selection for all browsers */
+    white-space: nowrap;
+    /* Prevents text from wrapping to the next line */
+    flex: 1 1 0;
+    /* Sets the flex-grow, flex-shrink, and flex-basis properties */
+    border-left: 0.1875rem solid rgb(27, 176, 219) !important;
+    /* Sets a solid left border with a specific color and overrides any other border styles */
+  }
+
+  /* Styles for when the .nice-select element is hovered over */
+  .nice-select:hover {
+    border-color: #d0dae5;
+    /* Changes the border color to a light blue */
+  }
+
+  /* Styles for when the .nice-select element is active, open, or focused */
+  .nice-select:active,
+  .nice-select.open,
+  .nice-select:focus {
+    border-color: #88bfff;
+    /* Changes the border color to a brighter blue */
+  }
+
+  /* Styles for the dropdown arrow icon */
+  .nice-select:after {
+    border-bottom: 2px solid #90a1b5;
+    /* Sets the bottom border of the arrow icon */
+    border-right: 2px solid #90a1b5;
+    /* Sets the right border of the arrow icon */
+    content: "";
+    /* Adds an empty string as content for the pseudo-element */
+    display: block;
+    /* Displays the pseudo-element as a block-level element */
+    height: 5px;
+    /* Sets the height of the arrow icon to 5 pixels */
+    margin-top: -4px;
+    /* Adjusts the vertical position of the arrow icon */
+    pointer-events: none;
+    /* Disables pointer events on the arrow icon */
+    position: absolute;
+    /* Sets the positioning context to absolute */
+    right: 12px;
+    /* Positions the arrow icon 12 pixels from the right edge */
+    top: 50%;
+    /* Positions the arrow icon vertically centered */
+    -webkit-transform-origin: 66% 66%;
+    /* Sets the transform origin for WebKit-based browsers */
+    -ms-transform-origin: 66% 66%;
+    /* Sets the transform origin for Microsoft browsers */
+    transform-origin: 66% 66%;
+    /* Sets the transform origin for all browsers */
+    -webkit-transform: rotate(45deg);
+    /* Rotates the arrow icon 45 degrees for WebKit-based browsers */
+    -ms-transform: rotate(45deg);
+    /* Rotates the arrow icon 45 degrees for Microsoft browsers */
+    transform: rotate(45deg);
+    /* Rotates the arrow icon 45 degrees for all browsers */
+    width: 5px;
+    /* Sets the width of the arrow icon to 5 pixels */
+  }
+
+  /* Styles for the dropdown arrow icon when the .nice-select element is open */
+  .nice-select.open:after {
+    -webkit-transform: rotate(-135deg);
+    /* Rotates the arrow icon -135 degrees for WebKit-based browsers */
+    -ms-transform: rotate(-135deg);
+    /* Rotates the arrow icon -135 degrees for Microsoft browsers */
+    transform: rotate(-135deg);
+    /* Rotates the arrow icon -135 degrees for all browsers */
+  }
+
+  /* Styles for the dropdown list when the .nice-select element is open */
+  .nice-select.open .list {
+    opacity: 1;
+    /* Sets the opacity of the list to fully visible */
+    pointer-events: auto;
+    /* Enables pointer events on the list */
+    -webkit-transform: scale(1) translateY(0);
+    /* Scales the list to its original size and positions it vertically for WebKit-based browsers */
+    -ms-transform: scale(1) translateY(0);
+    /* Scales the list to its original size and positions it vertically for Microsoft browsers */
+    transform: scale(1) translateY(0);
+    /* Scales the list to its original size and positions it vertically for all browsers */
+  }
+
+  /* Styles for the .nice-select element when it is disabled */
+  .nice-select.disabled {
+    border-color: #e7ecf2;
+    /* Sets the border color to a light gray */
+    color: #90a1b5;
+    /* Sets the text color to a darker gray */
+    pointer-events: none;
+    /* Disables pointer events on the element */
+  }
+
+  /* Styles for the dropdown arrow icon when the .nice-select element is disabled */
+  .nice-select.disabled:after {
+    border-color: #cdd5de;
+    /* Sets the border color of the arrow icon to a light gray */
+  }
+
+  /* Styles for the .nice-select element when it has the .wide class */
+  .nice-select.wide {
+    width: 100%;
+    /* Sets the width of the element to 100% */
+  }
+
+  /* Styles for the dropdown list when the .nice-select element has the .wide class */
+  .nice-select.wide .list {
+    left: 0 !important;
+    /* Positions the list at the left edge and overrides any other left positioning */
+    right: 0 !important;
+    /* Positions the list at the right edge and overrides any other right positioning */
+  }
+
+  /* Styles for the .nice-select element when it has the .right class */
+  .nice-select.right {
+    float: right;
+    /* Floats the element to the right */
+  }
+
+  /* Styles for the dropdown list when the .nice-select element has the .right class */
+  .nice-select.right .list {
+    left: auto;
+    /* Resets the left positioning of the list */
+    right: 0;
+    /* Positions the list at the right edge */
+  }
+
+  /* Styles for the .nice-select element when it has the .small class */
+  .nice-select.small {
+    font-size: 12px;
+    /* Sets the font size to 12 pixels */
+    height: 36px;
+    /* Sets the height of the element to 36 pixels */
+    line-height: 34px;
+    /* Sets the line height to 34 pixels */
+  }
+
+  /* Styles for the list items inside the .nice-select element */
+  .nice-select li {
+    margin-bottom: 2px;
+    /* Adds 2 pixels of margin at the bottom of each list item */
+  }
+
+  /* Styles for the dropdown list inside the .nice-select element */
+  .nice-select .list {
+    background-color: #fff;
+    /* Sets the background color of the list to white */
+    border-radius: 5px;
+    /* Adds a 5-pixel border radius to the list */
+    box-shadow: 0 0 0 1px rgba(68, 88, 112, 0.11);
+    /* Adds a subtle box shadow to the list */
+    box-sizing: border-box;
+    /* Includes padding and border in the list's total width and height */
+    margin-top: 4px;
+    /* Adds 4 pixels of margin at the top of the list */
+    opacity: 0;
+    /* Initially sets the list to be invisible */
+    overflow: hidden;
+    /* Hides any content that overflows the list */
+    padding: 0;
+    /* Removes any padding from the list */
+    pointer-events: none;
+    /* Disables pointer events on the list */
+    position: absolute;
+    /* Sets the positioning context to absolute */
+    top: 100%;
+    /* Positions the list below the .nice-select element */
+    max-height: 300px;
+    /* Sets the maximum height of the list to 300 pixels */
+    overflow-y: scroll;
+    /* Adds a vertical scrollbar if the list content exceeds the maximum height */
+    left: 0;
+    /* Positions the list at the left edge */
+    -webkit-transform-origin: 50% 0;
+    /* Sets the transform origin for WebKit-based browsers */
+    -ms-transform-origin: 50% 0;
+    /* Sets the transform origin for Microsoft browsers */
+    transform-origin: 50% 0;
+    /* Sets the transform origin for all browsers */
+    -webkit-transform: scale(0.75) translateY(-21px);
+    /* Scales the list down and positions it vertically for WebKit-based browsers */
+    -ms-transform: scale(0.75) translateY(-21px);
+    /* Scales the list down and positions it vertically for Microsoft browsers */
+    transform: scale(0.75) translateY(-21px);
+    /* Scales the list down and positions it vertically for all browsers */
+    z-index: 9;
+    /* Sets the z-index of the list to ensure it appears above other elements */
+  }
+
+  /* Styles for the list items inside the .nice-select element when the list is hovered over */
+  .nice-select .list:hover .option:not(:hover) {
+    background-color: transparent !important;
+    /* Sets the background color of non-hovered list items to transparent and overrides any other background color styles */
+  }
+
+  /* Styles for the list items inside the .nice-select element */
+  .nice-select .option {
+    cursor: pointer;
+    /* Changes the cursor to a pointer when hovering over a list item */
+    font-weight: 400;
+    /* Sets the font weight of the list items to normal */
+    line-height: 40px;
+    /* Sets the line height of the list items to 40 pixels */
+    list-style: none;
+    /* Removes the default list-style (e.g., bullets or numbers) */
+    font-size: 1rem;
+    /* Sets the font size of the list items to 1 root em */
+    min-height: 40px;
+    /* Sets the minimum height of the list items to 40 pixels */
+    outline: none;
+    /* Removes the default outline when a list item is focused */
+    padding-left: 18px;
+    /* Adds 18 pixels of padding to the left side of the list items */
+    padding-right: 29px;
+    /* Adds 29 pixels of padding to the right side of the list items */
+    text-align: left;
+    /* Aligns the text of the list items to the left */
+    box-sizing: border-box;
+    /* Includes padding and border in the list items' total width and height */
+    min-width: 200px;
+    /* Sets the minimum width of the list items to 200 pixels */
+  }
+
+  /* Styles for the list items inside the .nice-select element when hovered over, focused, or selected and focused */
+  .nice-select .option:hover,
+  .nice-select .option.focus,
+  .nice-select .option.selected.focus {
+    background-color: #f6f7f9;
+    /* Sets the background color of the list item to a light gray */
+  }
+
+  /* Styles for the selected list item inside the .nice-select element */
+  .nice-select .option.selected {
+    font-weight: bold;
+    /* Sets the font weight of the selected list item to bold */
+  }
+
+  /* Styles for the disabled list items inside the .nice-select element */
+  .nice-select .option.disabled {
+    background-color: transparent;
+    /* Sets the background color of disabled list items to transparent */
+    color: #90a1b5;
+    /* Sets the text color of disabled list items to a darker gray */
+    cursor: default;
+    /* Changes the cursor to the default cursor for disabled list items */
+  }
+
+  /* Additional styles for the .nice-select element */
+  .nice-select {
+    display: flex;
+    /* Displays the element as a flex container */
+    min-width: 120px;
+    /* Sets the minimum width of the element to 120 pixels */
+    width: auto;
+    /* Sets the width of the element to automatically adjust based on its content */
+  }
+
+  /* Styles for the .advice-calculator-button element when it has the .active class */
+  .advice-calculator-button.active {
+    border: 0.125rem solid rgb(27, 167, 218);
+    /* Sets a solid border with a specific color and width */
+    background-color: rgb(230, 249, 255);
+    /* Sets the background color to a light blue */
+  }
+
+  /* Styles for the .ac-composition element */
+  .ac-composition {
+    transition: transform 0.3s ease;
+    /* Adds a smooth transition effect for the transform property with a duration of 0.3 seconds and an easing function */
+  }
+
+  /* Styles for the .pulse-enter-done class */
+  .pulse-enter-done {
+    transform: scale3d(1, 1, 1);
+    /* Scales the element to its original size */
+    transition: transform 0.3s ease;
+    /* Adds a smooth transition effect for the transform property with a duration of 0.3 seconds and an easing function */
+  }
+
+  /* Styles for the .pulse-exit-done class */
+  .pulse-exit-done {
+    transform: scale3d(0, 0, 0);
+    /* Scales the element down to zero size */
+    transition: transform 0.3s ease;
+    /* Adds a smooth transition effect for the transform property with a duration of 0.3 seconds and an easing function */
+  }
+
+  /* Styles for the first .nice-select element inside the .advice-calculator element */
+  .advice-calculator .nice-select:first-child {
+    width: 100%;
+    /* Sets the width of the first .nice-select element to 100% */
+  }
+
+  /* Styles for the .delete-button element */
+  .delete-button {
+    position: relative;
+    /* Sets the positioning context to relative */
+    left: 110px;
+    /* Positions the element 110 pixels from the left edge */
+    top: -60px;
+    /* Positions the element 60 pixels above its original position */
+  }
+
+  /* Styles for the .ac-error-msg element inside the .ac-child-age element */
+  .ac-child-age .ac-error-msg {
+    margin-top: -20px;
+    /* Adjusts the top margin of the .ac-error-msg element to -20 pixels */
+  }
+</style>
+
+<script>
+  // Function to scroll to the first visible error message
+  function scrollToFirstVisibleError() {
+    // Get all elements with the class 'ac-error-msg'
+    var errorMessages = document.querySelectorAll('.ac-error-msg');
+
+    // Loop through the error messages
+    for (var i = 0; i < errorMessages.length; i++) {
+      // Check if the current error message is visible
+      if (window.getComputedStyle(errorMessages[i]).display === 'block') {
+        // If visible, scroll to the error message and center it
+        errorMessages[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Exit the loop after scrolling to the first visible error message
+        break;
+      }
+    }
+  }
+</script>

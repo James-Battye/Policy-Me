@@ -1,0 +1,117 @@
+<script>
+  // Select all elements with the class 'save-to-my-email' and add a click event listener to each
+  document.querySelectorAll('.save-to-my-email').forEach(function (element) {
+    element.addEventListener('click', function () {
+      // When the button is clicked, remove the 'hidden' class from the modal cover and email modal to display them
+      document.querySelector('.modal-cover').classList.remove('hidden');
+      document.querySelector('.email-modal').classList.remove('hidden');
+    });
+  });
+
+  // Add a click event listener to the close button of the modal
+  document.querySelector('.close-modal-button').addEventListener('click', function () {
+    // When the close button is clicked, add the 'hidden' class to hide the modal cover and email modal
+    document.querySelector('.modal-cover').classList.add('hidden');
+    document.querySelector('.email-modal').classList.add('hidden');
+  });
+
+  // Define headers for API requests, including content type and tenant ID
+  let headers = { "Content-Type": "application/json", "x-tenant-id": "23dad38d-f5ad-4703-8ec0-9276d8bcf4a3" };
+
+  // Asynchronous function to submit the email for verification and user creation
+  async function submitEmail(householdId, sessionId, email) {
+    // Verify the email by sending a request to the API
+    const verifyEmail = await fetch(`${urlPrefix}/api/global-main/v1/email/verify?email=` + email.replace('+', encodeURIComponent('+')), { headers });
+    const verifyRes = await verifyEmail.json(); // Parse the response as JSON
+
+    // Check if the email is undeliverable
+    if (verifyRes.data.result === 'undeliverable') {
+      // If undeliverable, get the email input value from the modal
+      var email = document.querySelector('#rec-email').value;
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regular expression for validating email format
+      var errorMSG = document.querySelector('.email-modal-error-msg'); // Select the error message element
+
+      // Validate the email input
+      if (!email) {
+        // If no email is provided, show an error message
+        errorMSG.textContent = 'Entrez une adresse courriel';
+        errorMSG.classList.remove('hidden');
+        errorMSG.style.display = 'block';
+      } else if (!emailPattern.test(email)) {
+        // If the email format is invalid, show an error message
+        errorMSG.textContent = 'Email invalide';
+        errorMSG.classList.remove('hidden');
+        errorMSG.style.display = 'block';
+      }
+    } else {
+      // If the email is valid, hide any existing error messages
+      document.querySelector('.email-modal-error-msg').style.display = 'none';
+
+      // Create a new user by sending a POST request to the API
+      const createUser = await fetch(`${urlPrefix}/api/global-accounts/v1/users`, { method: "POST", headers, body: JSON.stringify({ email, account_language_preference: "en-CA" }) });
+
+      // Update household information by sending a PATCH request to the API
+      const patchHouseholdReq = await fetch(`${urlPrefix}/api/global-main/v1/household_infos/${householdId}/0`, { method: "PATCH", headers, body: JSON.stringify({ user: { email } }) });
+
+      // Send data to the CRM by making a POST request
+      const postCRM = await fetch(`${urlPrefix}/api/global-main/v1/crm`, {
+        method: "POST", headers, body: JSON.stringify({
+          "data": {},
+          "sync_type": 6,
+          "identifiers": {
+            "life_session_id": sessionId,
+            email
+          }
+        })
+      });
+
+      // Hide the error message and close the modal after successful submission
+      document.querySelector('.email-modal-error-msg').classList.add('hidden');
+      document.querySelector('.email-modal-error-msg').style.display = 'block';
+      document.querySelector('.modal-cover').classList.add('hidden');
+      document.querySelector('.email-modal').classList.add('hidden');
+    }
+  }
+
+  // Initialize variables to hold various elements for later use
+  let eventListenerAdded = 0;
+  let resultElms = document.querySelectorAll(".ac-result");
+  let neededElms = document.querySelectorAll(".coverage-needed");
+  let notNeededElms = document.querySelectorAll(".no-coverage-needed");
+  let moreNeededElms = document.querySelectorAll(".more-coverage-needed");
+  let monthlyPrices = document.querySelectorAll(".ac-price-number");
+  let optionPrices = document.querySelectorAll(".option-price");
+  let optionTerms = document.querySelectorAll(".option-price-years");
+  let breakdowns = document.querySelectorAll(".ac-table-number");
+  let saveEmail = document.querySelectorAll(".save-to-my-email");
+  var submitElms = document.querySelectorAll(".ac-customize-quote");
+  var calculatedImg = document.querySelector(".ac-calculated-image");
+  var rcmdMsgs = document.querySelectorAll(".ac-recommendation-message");
+
+  // Define the base URL for API requests
+  const urlPrefix = window.location.origin;
+  const urlApp = urlPrefix + '/life/life/life-insurance-quotes-continued?';
+
+  // Function to hide elements by setting their display property to 'none'
+  function hideElems(t) { for (e of t) e.style.setProperty("display", "none", "important") }
+
+  // Function to display elements by setting their display property to a specified value (default is 'block')
+  function displayElems(t, r = "block") { for (e of t) e.style.setProperty("display", r, "important") }
+
+  // Function to format day values to ensure they are two digits
+  function formatDay(t) { return t < 10 ? "0" + t : t.toString() }
+
+  // Function to format currency values according to Canadian standards
+  function formatCurrency(t) { return t.toLocaleString("fr-CA", { style: "currency", currency: "CAD", minimumFractionDigits: 0 }) }
+
+  // Select all radio option elements for handling user selections
+  let radioOptions = document.querySelectorAll('.ac-card-option');
+  for (let ro of radioOptions) {
+    // Add a click event listener to each radio option
+    ro.addEventListener('click', function () {
+      // When clicked, trigger a click on the associated container element
+      this.querySelector('.rg-container').click();
+    })
+  }
+
+</script>
