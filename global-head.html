@@ -1,173 +1,426 @@
-< !--Add Sentry-->
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      if (window.Sentry) {
-        Sentry.init({
-          dsn: 'https://f3062de06f51486996ec961a7e2de940@o183124.ingest.us.sentry.io/4505550882865152',
-          sampleRate: 0.3,
-        });
-      }
-    });
-  </script>
-  <script src="https://js.sentry-cdn.com/f3062de06f51486996ec961a7e2de940.min.js" crossorigin="anonymous"
-    async></script>
-  <!--End adding Sentry-- >
-
-< !--commenting out as jquery 3.5.1 is provided
--->
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-  <style>
-    .w-webflow-badge {
-      display: none !important;
-    }
-
-    .js-accordion-body {
-      display: none;
-    }
-  </style>
-
-  <link rel="preconnect" href="https://global-uploads.webflow.com">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://connect.facebook.net">
-
-
-  <!-- Script to initialize analytics -->
-  <!-- Source: global-tools-development/js/addAllAnalytics.js -->
-  <script>
-    // Segment
-    let utm_fields = ['utm_content', 'utm_medium', 'utm_name', 'utm_source', 'utm_term', 'utm_campaign'];
-    const searchParams = new URLSearchParams(window.location.search);
-    function getCookiesStartingWith(prefix) {
-      var cookies = document.cookie.split(';').map(cookie => cookie.trim());
-      var filteredCookies = cookies.filter(cookie => cookie.startsWith(prefix));
-      var cookieObject = {};
-      for (let field of utm_fields) { if (searchParams.get(field)) cookieObject[field] = searchParams.get(field) }
-      filteredCookies.forEach(cookie => {
-        var [name, value] = cookie.split('=');
-        if (utm_fields.includes(name))
-          cookieObject[name.trim()] = decodeURIComponent(value);
+<!-- Add Sentry -->
+<script>
+  // This script initializes Sentry for error tracking once the DOM is fully loaded.
+  document.addEventListener('DOMContentLoaded', function () {
+    // Check if the Sentry object is available in the window.
+    if (window.Sentry) {
+      // Initialize Sentry with the provided DSN (Data Source Name) and sample rate.
+      Sentry.init({
+        dsn: 'https://f3062de06f51486996ec961a7e2de940@o183124.ingest.us.sentry.io/4505550882865152',
+        sampleRate: 0.3, // This controls the percentage of events that are sent to Sentry.
       });
-      return cookieObject;
     }
-    var utmCookies = getCookiesStartingWith('utm');
-    function initSegment() {
-      !function () { let e = window.location.href, t = new URL(e), a = t.hostname, n = a.split(".")[0], i = n.includes("dev"), r = "POLICYME", o = (i ? { POLICYME: "QqrFZgjuzqIbSqedhsqm8NnzDjywdQwO" } : { POLICYME: "9yU9AEKQBMpgTbX0pRHo8fdtUMipQPHA" }).POLICYME; console.log(i, r, "", o), function () { var e = window.analytics = window.analytics || []; if (!e.initialize) { if (e.invoked) window.console && console.error && console.error("Segment snippet included twice."); else { e.invoked = !0, e.methods = ["trackSubmit", "trackClick", "trackLink", "trackForm", "pageview", "identify", "reset", "group", "track", "ready", "alias", "debug", "page", "once", "off", "on", "addSourceMiddleware", "addIntegrationMiddleware", "setAnonymousId", "addDestinationMiddleware"], e.factory = function (t) { return function () { if (window.analytics.initialized) return window.analytics[t].apply(window.analytics, arguments); var a = Array.prototype.slice.call(arguments); return a.unshift(t), e.push(a), e } }; for (var t = 0; t < e.methods.length; t++) { var a = e.methods[t]; e[a] = e.factory(a) } e.load = function (t, a) { var n = document.createElement("script"); n.type = "text/javascript", n.async = !0, n.src = "https://cdn.segment.com/analytics.js/v1/" + t + "/analytics.min.js"; var i = document.getElementsByTagName("script")[0]; i.parentNode.insertBefore(n, i), e._loadOptions = a }, e._writeKey = o, e.SNIPPET_VERSION = "4.16.1", e.load(o), e.page({ ...utmCookies, tenant: r, tenant_suborganization: "", tenant_id: "23dad38d-f5ad-4703-8ec0-9276d8bcf4a3" }) } } }() }();
+  });
+</script>
+<!-- Load the Sentry JavaScript SDK asynchronously -->
+<script src="https://js.sentry-cdn.com/f3062de06f51486996ec961a7e2de940.min.js" crossorigin="anonymous" async></script>
+<!-- End adding Sentry -->
+
+<!-- Commenting out as jQuery 3.5.1 is provided -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<style>
+  /* CSS to hide the Webflow badge */
+  .w-webflow-badge {
+    display: none !important; // Ensures the badge is not displayed.
+  }
+
+  /* CSS to hide the accordion body by default */
+  .js-accordion-body {
+    display: none; // Hides the accordion body until it is triggered to show.
+  }
+</style>
+
+<!-- Preconnect to various domains for performance optimization -->
+<link rel="preconnect" href="https://global-uploads.webflow.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://connect.facebook.net">
+
+<!-- Script to initialize analytics -->
+<!-- Source: global-tools-development/js/addAllAnalytics.js -->
+<script>
+  // Define an array of UTM parameters to track.
+  let utm_fields = ['utm_content', 'utm_medium', 'utm_name', 'utm_source', 'utm_term', 'utm_campaign'];
+  // Create a URLSearchParams object to easily access query parameters from the URL.
+  const searchParams = new URLSearchParams(window.location.search);
+
+  // Function to retrieve cookies that start with a specific prefix.
+  function getCookiesStartingWith(prefix) {
+    // Split the document's cookies into an array and trim whitespace.
+    var cookies = document.cookie.split(';').map(cookie => cookie.trim());
+    // Filter cookies to only include those that start with the specified prefix.
+    var filteredCookies = cookies.filter(cookie => cookie.startsWith(prefix));
+    var cookieObject = {}; // Object to store the UTM cookies.
+
+    // Loop through each UTM field to check if it exists in the URL parameters.
+    for (let field of utm_fields) {
+      if (searchParams.get(field))
+        cookieObject[field] = searchParams.get(field); // Add to cookieObject if found.
     }
 
+    // Loop through the filtered cookies to decode and add them to the cookieObject.
+    filteredCookies.forEach(cookie => {
+      var [name, value] = cookie.split('=');
+      if (utm_fields.includes(name))
+        cookieObject[name.trim()] = decodeURIComponent(value); // Decode and store the cookie value.
+    });
+    return cookieObject; // Return the constructed cookie object.
+  }
 
-    function initDatawarehouse() {
-      (function (w, d) {
-        var id = 'pdst-capture', n = 'script';
-        if (!d.getElementById(id)) {
-          w.pdst = w.pdst || function () { (w.pdst.q = w.pdst.q || []).push(arguments); };
-          var e = d.createElement(n); e.id = id; e.async = 1;
-          e.src = 'https://cdn.pdst.fm/ping.min.js';
-          var s = d.getElementsByTagName(n)[0];
-          s.parentNode.insertBefore(e, s);
+  // Retrieve UTM cookies that start with 'utm'.
+  var utmCookies = getCookiesStartingWith('utm');
+
+  // Function to initialize Segment analytics.
+  function initSegment() {
+    !function () {
+      // Get the current URL and its hostname.
+      let e = window.location.href,
+        t = new URL(e),
+        a = t.hostname,
+        n = a.split(".")[0],
+        i = n.includes("dev"), // Check if the hostname indicates a development environment.
+        r = "POLICYME",
+        o = (i ? { POLICYME: "QqrFZgjuzqIbSqedhsqm8NnzDjywdQwO" } : { POLICYME: "9yU9AEKQBMpgTbX0pRHo8fdtUMipQPHA" }).POLICYME; // Set the appropriate write key based on the environment.
+
+      console.log(i, r, "", o), // Log the environment and write key for debugging.
+
+        // Initialize Segment analytics.
+        function () {
+          var e = window.analytics = window.analytics || []; // Create or reference the analytics object.
+          if (!e.initialize) { // Check if Segment has already been initialized.
+            if (e.invoked)
+              window.console && console.error && console.error("Segment snippet included twice."); // Warn if the snippet is included multiple times.
+            else {
+              e.invoked = !0; // Mark as invoked to prevent re-initialization.
+              // Define the methods available on the analytics object.
+              e.methods = ["trackSubmit", "trackClick", "trackLink", "trackForm", "pageview", "identify", "reset", "group", "track", "ready", "alias", "debug", "page", "once", "off", "on", "addSourceMiddleware", "addIntegrationMiddleware", "setAnonymousId", "addDestinationMiddleware"];
+              // Create a factory function for each method.
+              e.factory = function (t) {
+                return function () {
+                  if (window.analytics.initialized)
+                    return window.analytics[t].apply(window.analytics, arguments); // Call the method if already initialized.
+                  var a = Array.prototype.slice.call(arguments);
+                  return a.unshift(t), e.push(a), e; // Push the method call to the queue.
+                }
+              };
+              // Loop through each method and assign the factory function.
+              for (var t = 0; t < e.methods.length; t++) {
+                var a = e.methods[t];
+                e[a] = e.factory(a);
+              }
+              // Load the Segment analytics script asynchronously.
+              e.load = function (t, a) {
+                var n = document.createElement("script");
+                n.type = "text/javascript",
+                  n.async = !0,
+                  n.src = "https://cdn.segment.com/analytics.js/v1/" + t + "/analytics.min.js";
+                var i = document.getElementsByTagName("script")[0];
+                i.parentNode.insertBefore(n, i), e._loadOptions = a; // Insert the script into the document.
+              },
+                e._writeKey = o, // Set the write key for Segment.
+                e.SNIPPET_VERSION = "4.16.1", // Version of the Segment snippet.
+                e.load(o), // Load the Segment script with the write key.
+                e.page({ ...utmCookies, tenant: r, tenant_suborganization: "", tenant_id: "23dad38d-f5ad-4703-8ec0-9276d8bcf4a3" }); // Track the page view with UTM cookies and tenant information.
+            }
+          }
+        }()
+    }();
+  }
+
+  // Function to initialize the data warehouse analytics.
+  function initDatawarehouse() {
+    (function (w, d) {
+      var id = 'pdst-capture', n = 'script'; // Define the ID for the script element.
+      if (!d.getElementById(id)) { // Check if the script is already included.
+        w.pdst = w.pdst || function () { (w.pdst.q = w.pdst.q || []).push(arguments); }; // Create the pdst function if it doesn't exist.
+        var e = d.createElement(n);
+        e.id = id;
+        e.async = 1; // Set the script to load asynchronously.
+        e.src = 'https://cdn.pdst.fm/ping.min.js'; // Set the source of the script.
+        var s = d.getElementsByTagName(n)[0];
+        s.parentNode.insertBefore(e, s); // Insert the script into the document.
+      }
+      w.pdst('conf', { key: '1884f83ab1c741e597d6f68b42912fab' }); // Configure the pdst with the provided key.
+      w.pdst('view'); // Send a view event to the pdst.
+    })(window, document);
+  }
+
+  // Function to initialize Facebook analytics.
+  function initFB() {
+    !function (e, t, n, c, o, a, f) {
+      e.fbq || (o = e.fbq = function () {
+        o.callMethod ? o.callMethod.apply(o, arguments) : o.queue.push(arguments) // Check if fbq is already defined.
+      },
+        e._fbq || (e._fbq = o), // Create a reference to fbq.
+        o.push = o,
+        o.loaded = !0,
+        o.version = "2.0",
+        o.queue = [], // Initialize the queue for Facebook events.
+        (a = t.createElement(n)).async = !0, // Create a script element for Facebook.
+        a.src = "https://connect.facebook.net/en_US/fbevents.js", // Set the source for the Facebook script.
+        (f = t.getElementsByTagName(n)[0]).parentNode.insertBefore(a, f)) // Insert the Facebook script into the document.
+    }(window, document, "script"),
+      fbq("init", "2252185018335717"), // Initialize Facebook with the provided pixel ID.
+      fbq("track", "PageView"); // Track a page view event.
+  }
+
+  // Function to initialize all analytics services.
+  function initAnalytics() {
+    initSegment(); // Initialize Segment analytics.
+    initDatawarehouse(); // Initialize data warehouse analytics.
+    initFB(); // Initialize Facebook analytics.
+  }
+</script>
+<!-- End script to initialize analytics -->
+
+<!-- Start VWO Async SmartCode -->
+<link rel="preconnect" href="https://dev.visualwebsiteoptimizer.com" />
+<script type='text/javascript' id='vwoCode'>
+  // Check if localStorage and sessionStorage are available.
+  if (window.localStorage && window.sessionStorage) {
+    window._vwo_code || (function () {
+      var account_id = 857937, // Set the account ID for VWO.
+        version = 2.1, // Version of the VWO script.
+        settings_tolerance = 2000, // Timeout for settings retrieval.
+        hide_element = 'body', // Element to hide during loading.
+        hide_element_style = 'opacity:0 !important;filter:alpha(opacity=0) !important;background:none !important', // CSS to hide the element.
+        /* DO NOT EDIT BELOW THIS LINE */
+        f = false, // Flag to check if the VWO code has finished loading.
+        w = window,
+        d = document,
+        v = d.querySelector('#vwoCode'), // Reference to the VWO script element.
+        cK = '_vwo_' + account_id + '_settings', // Key for storing settings in storage.
+        cc = {}; // Object to hold the settings.
+
+      // Try to retrieve and parse the VWO configuration from localStorage.
+      try {
+        var c = JSON.parse(localStorage.getItem('_vwo_' + account_id + '_config'));
+        cc = c && typeof c === 'object' ? c : {}; // If valid, assign to cc.
+      } catch (e) { }
+
+      // Determine which storage to use based on the session type.
+      var stT = cc.stT === 'session' ? w.sessionStorage : w.localStorage;
+      code = {
+        // Function to check if existing jQuery is being used.
+        use_existing_jquery: function () {
+          return typeof use_existing_jquery !== 'undefined' ? use_existing_jquery : undefined
+        },
+        // Function to check library tolerance.
+        library_tolerance: function () {
+          return typeof library_tolerance !== 'undefined' ? library_tolerance : undefined
+        },
+        // Function to get settings tolerance.
+        settings_tolerance: function () {
+          return cc.sT || settings_tolerance
+        },
+        // Function to get the style for hiding elements.
+        hide_element_style: function () {
+          return '{' + (cc.hES || hide_element_style) + '}'
+        },
+        // Function to determine which element to hide.
+        hide_element: function () {
+          if (performance.getEntriesByName('first-contentful-paint')[0]) {
+            return '' // If the first contentful paint has occurred, do not hide anything.
+          }
+          return typeof cc.hE === 'string' ? cc.hE : hide_element; // Return the hide element or default.
+        },
+        // Function to get the version of the VWO script.
+        getVersion: function () {
+          return version
+        },
+        // Function to finish the VWO loading process.
+        finish: function (e) {
+          if (!f) {
+            f = true; // Mark as finished.
+            var t = d.getElementById('_vis_opt_path_hides');
+            if (t) t.parentNode.removeChild(t); // Remove the hide element if it exists.
+            if (e) (new Image).src = 'https://dev.visualwebsiteoptimizer.com/ee.gif?a=' + account_id + e; // Send a request to VWO if an error occurs.
+          }
+        },
+        // Function to check if the VWO loading is finished.
+        finished: function () {
+          return f
+        },
+        // Function to add a script to the document.
+        addScript: function (e) {
+          var t = d.createElement('script');
+          t.type = 'text/javascript';
+          if (e.src) {
+            t.src = e.src // Set the source if provided.
+          } else {
+            t.text = e.text // Otherwise, set the text content.
+          }
+          d.getElementsByTagName('head')[0].appendChild(t); // Append the script to the head.
+        },
+        // Function to load the VWO settings.
+        load: function (e, t) {
+          var n = this.getSettings(), // Get the current settings.
+            i = d.createElement('script'),
+            r = this;
+          t = t || {}; // Default to an empty object if no options are provided.
+          if (n) { // If settings are available.
+            i.textContent = n;
+            d.getElementsByTagName('head')[0].appendChild(i); // Append the settings script to the head.
+            if (!w.VWO || VWO.caE) {
+              stT.removeItem(cK); // Remove the settings from storage if VWO is not initialized.
+              r.load(e) // Load the VWO script.
+            }
+          } else {
+            var o = new XMLHttpRequest;
+            o.open('GET', e, true); // Create a new XMLHttpRequest to fetch the settings.
+            o.responseType = t.responseType || 'text';
+            o.onload = function () {
+              if (t.onloadCb) {
+                return t.onloadCb(o, e) // Call the onload callback if provided.
+              }
+              if (o.status === 200) {
+                _vwo_code.addScript({ text: o.responseText }) // Add the fetched script if successful.
+              } else {
+                _vwo_code.finish('&e=loading_failure:' + e) // Finish with an error if the request fails.
+              }
+            };
+            o.onerror = function () {
+              if (t.onerrorCb) {
+                return t.onerrorCb(e) // Call the error callback if provided.
+              }
+              _vwo_code.finish('&e=loading_failure:' + e) // Finish with an error if the request fails.
+            };
+            o.send() // Send the request.
+          }
+        },
+        // Function to get the VWO settings from storage.
+        getSettings: function () {
+          try {
+            var e = stT.getItem(cK); // Retrieve the settings from storage.
+            if (!e) {
+              return // Return if no settings are found.
+            }
+            e = JSON.parse(e); // Parse the settings.
+            if (Date.now() > e.e) {
+              stT.removeItem(cK); // Remove expired settings.
+              return
+            }
+            return e.s // Return the settings.
+          } catch (e) {
+            return // Return if an error occurs during parsing.
+          }
+        },
+        // Function to initialize the VWO script.
+        init: function () {
+          if (d.URL.indexOf('__vwo_disable__') > -1) return; // Check if VWO is disabled via URL.
+          var e = this.settings_tolerance(); // Get the settings tolerance.
+          w._vwo_settings_timer = setTimeout(function () {
+            _vwo_code.finish();
+            stT.removeItem(cK) // Finish and remove settings after the timeout.
+          }, e);
+          var t;
+          if (this.hide_element() !== 'body') { // Check if the hide element is not the body.
+            t = d.createElement('style');
+            var n = this.hide_element(),
+              i = n ? n + this.hide_element_style() : '',
+              r = d.getElementsByTagName('head')[0];
+            t.setAttribute('id', '_vis_opt_path_hides');
+            v && t.setAttribute('nonce', v.nonce); // Set nonce for CSP if available.
+            t.setAttribute('type', 'text/css');
+            if (t.styleSheet)
+              t.styleSheet.cssText = i; // Set CSS for older IE versions.
+            else
+              t.appendChild(d.createTextNode(i)); // Append the CSS for modern browsers.
+            r.appendChild(t) // Append the style to the head.
+          } else {
+            t = d.getElementsByTagName('head')[0];
+            var i = d.createElement('div');
+            i.style.cssText = 'z-index: 2147483647 !important;position: fixed !important;left: 0 !important;top: 0 !important;width: 100% !important;height: 100% !important;background: white !important;'; // Style for the overlay.
+            i.setAttribute('id', '_vis_opt_path_hides');
+            i.classList.add('_vis_hide_layer'); // Add a class for the overlay.
+            t.parentNode.insertBefore(i, t.nextSibling) // Insert the overlay after the head.
+          }
+          var o = 'https://dev.visualwebsiteoptimizer.com/j.php?a=' + account_id + '&u=' + encodeURIComponent(d.URL) + '&vn=' + version; // Construct the URL for VWO.
+          if (w.location.search.indexOf('_vwo_xhr') !== -1) {
+            this.addScript({ src: o }) // Load the script if the URL contains the specific query parameter.
+          } else {
+            this.load(o + '&x=true') // Otherwise, load the script with the x parameter.
+          }
         }
-        w.pdst('conf', { key: '1884f83ab1c741e597d6f68b42912fab' });
-        w.pdst('view');
-      })(window, document);
+      };
+      w._vwo_code = code; // Assign the VWO code to the window object.
+      code.init(); // Initialize the VWO code.
+    })();
+  }
+</script>
+<!-- End VWO Async SmartCode -->
+
+<style>
+  /* Media queries for responsive design */
+  @media screen and (max-width: 991px) {
+    .w-nav-overlay {
+      display: none !important; // Hide the navigation overlay on smaller screens.
     }
 
-    function initFB() {
-      !function (e, t, n, c, o, a, f) { e.fbq || (o = e.fbq = function () { o.callMethod ? o.callMethod.apply(o, arguments) : o.queue.push(arguments) }, e._fbq || (e._fbq = o), o.push = o, o.loaded = !0, o.version = "2.0", o.queue = [], (a = t.createElement(n)).async = !0, a.src = "https://connect.facebook.net/en_US/fbevents.js", (f = t.getElementsByTagName(n)[0]).parentNode.insertBefore(a, f)) }(window, document, "script"), fbq("init", "2252185018335717"), fbq("track", "PageView");
+    .body>* {
+      transition: all 0.6s ease-in-out; // Smooth transition for all child elements.
+      left: 0; // Reset left position.
     }
 
-    function initAnalytics() {
-      initSegment();
-      initDatawarehouse();
-      initFB();
-    }</script>
-  <!-- End script to initialize analytics -->
-
-  <!-- Start VWO Async SmartCode -->
-  <link rel="preconnect" href="https://dev.visualwebsiteoptimizer.com" />
-  <script type='text/javascript' id='vwoCode'>
-    if (window.localStorage && window.sessionStorage) {
-      window._vwo_code || (function () {
-        var account_id = 857937,
-          version = 2.1,
-          settings_tolerance = 2000,
-          hide_element = 'body',
-          hide_element_style = 'opacity:0 !important;filter:alpha(opacity=0) !important;background:none !important',
-          /* DO NOT EDIT BELOW THIS LINE */
-          f = false, w = window, d = document, v = d.querySelector('#vwoCode'), cK = '_vwo_' + account_id + '_settings', cc = {}; try { var c = JSON.parse(localStorage.getItem('_vwo_' + account_id + '_config')); cc = c && typeof c === 'object' ? c : {} } catch (e) { } var stT = cc.stT === 'session' ? w.sessionStorage : w.localStorage; code = { use_existing_jquery: function () { return typeof use_existing_jquery !== 'undefined' ? use_existing_jquery : undefined }, library_tolerance: function () { return typeof library_tolerance !== 'undefined' ? library_tolerance : undefined }, settings_tolerance: function () { return cc.sT || settings_tolerance }, hide_element_style: function () { return '{' + (cc.hES || hide_element_style) + '}' }, hide_element: function () { if (performance.getEntriesByName('first-contentful-paint')[0]) { return '' } return typeof cc.hE === 'string' ? cc.hE : hide_element }, getVersion: function () { return version }, finish: function (e) { if (!f) { f = true; var t = d.getElementById('_vis_opt_path_hides'); if (t) t.parentNode.removeChild(t); if (e) (new Image).src = 'https://dev.visualwebsiteoptimizer.com/ee.gif?a=' + account_id + e } }, finished: function () { return f }, addScript: function (e) { var t = d.createElement('script'); t.type = 'text/javascript'; if (e.src) { t.src = e.src } else { t.text = e.text } d.getElementsByTagName('head')[0].appendChild(t) }, load: function (e, t) { var n = this.getSettings(), i = d.createElement('script'), r = this; t = t || {}; if (n) { i.textContent = n; d.getElementsByTagName('head')[0].appendChild(i); if (!w.VWO || VWO.caE) { stT.removeItem(cK); r.load(e) } } else { var o = new XMLHttpRequest; o.open('GET', e, true); o.responseType = t.responseType || 'text'; o.onload = function () { if (t.onloadCb) { return t.onloadCb(o, e) } if (o.status === 200) { _vwo_code.addScript({ text: o.responseText }) } else { _vwo_code.finish('&e=loading_failure:' + e) } }; o.onerror = function () { if (t.onerrorCb) { return t.onerrorCb(e) } _vwo_code.finish('&e=loading_failure:' + e) }; o.send() } }, getSettings: function () { try { var e = stT.getItem(cK); if (!e) { return } e = JSON.parse(e); if (Date.now() > e.e) { stT.removeItem(cK); return } return e.s } catch (e) { return } }, init: function () { if (d.URL.indexOf('__vwo_disable__') > -1) return; var e = this.settings_tolerance(); w._vwo_settings_timer = setTimeout(function () { _vwo_code.finish(); stT.removeItem(cK) }, e); var t; if (this.hide_element() !== 'body') { t = d.createElement('style'); var n = this.hide_element(), i = n ? n + this.hide_element_style() : '', r = d.getElementsByTagName('head')[0]; t.setAttribute('id', '_vis_opt_path_hides'); v && t.setAttribute('nonce', v.nonce); t.setAttribute('type', 'text/css'); if (t.styleSheet) t.styleSheet.cssText = i; else t.appendChild(d.createTextNode(i)); r.appendChild(t) } else { t = d.getElementsByTagName('head')[0]; var i = d.createElement('div'); i.style.cssText = 'z-index: 2147483647 !important;position: fixed !important;left: 0 !important;top: 0 !important;width: 100% !important;height: 100% !important;background: white !important;'; i.setAttribute('id', '_vis_opt_path_hides'); i.classList.add('_vis_hide_layer'); t.parentNode.insertBefore(i, t.nextSibling) } var o = 'https://dev.visualwebsiteoptimizer.com/j.php?a=' + account_id + '&u=' + encodeURIComponent(d.URL) + '&vn=' + version; if (w.location.search.indexOf('_vwo_xhr') !== -1) { this.addScript({ src: o }) } else { this.load(o + '&x=true') } } }; w._vwo_code = code; code.init();
-      })();
-    }
-  </script>
-  <!-- End VWO Async SmartCode -->
-
-  <style>
-    @media screen and (max-width: 991px) {
-      .w-nav-overlay {
-        display: none !important;
-      }
-
-      .body>* {
-        transition: all 0.6s ease-in-out;
-        left: 0;
-      }
-
-      .body>*:not(.nav-cookiewrapper) {
-        position: relative;
-      }
-
-      .body-nav-active>* {
-        left: 20rem !important;
-        position: relative !important;
-        transition: all 0.6s ease-in-out;
-      }
+    .body>*:not(.nav-cookiewrapper) {
+      position: relative; // Set position to relative for all elements except the nav cookie wrapper.
     }
 
-    @media screen and (max-width: 479px) {
-      .body-nav-active {
-        position: fixed;
-      }
+    .body-nav-active>* {
+      left: 20rem !important; // Shift elements to the right when the nav is active.
+      position: relative !important; // Ensure relative positioning.
+      transition: all 0.6s ease-in-out; // Smooth transition for active state.
+    }
+  }
 
-      .mobile-subnav-menu {
-        height: 100vh;
-        overflow: scroll;
-      }
-
-      .mobile-childnav-menu {
-        height: 100vh;
-        overflow: scroll;
-      }
-
-      .w-nav-overlay {
-        display: none !important;
-      }
-
-      .body-nav-active.body-nav-active>* {
-        left: 18rem !important;
-      }
+  @media screen and (max-width: 479px) {
+    .body-nav-active {
+      position: fixed; // Fix the position of the nav on very small screens.
     }
 
-    .body-nav-active .mobile-toc-2 {
-      position: relative !important;
-      top: 0px !important;
+    .mobile-subnav-menu {
+      height: 100vh; // Set height to full viewport height.
+      overflow: scroll; // Allow scrolling for overflow content.
     }
 
-    .mobile-toc-2 {
-      position: sticky !important;
+    .mobile-childnav-menu {
+      height: 100vh; // Set height to full viewport height.
+      overflow: scroll; // Allow scrolling for overflow content.
     }
 
-    .breadcrumb-text {
-      margin-left: 4px;
-      margin-right: 4px;
+    .w-nav-overlay {
+      display: none !important; // Hide the navigation overlay on very small screens.
     }
 
-    @keyframes spin {
-      0% {
-        transform: rotate(0deg);
-      }
-
-      100% {
-        transform: rotate(360deg);
-      }
+    .body-nav-active.body-nav-active>* {
+      left: 18rem !important; // Adjust left position for active nav on small screens.
     }
-  </style>
+  }
 
-  <script src="https://analytics.ahrefs.com/analytics.js" data-key="ghW8s5ijSVQ8U0ylZAtVhA" defer="true"></script>
+  .body-nav-active .mobile-toc-2 {
+    position: relative !important; // Ensure the mobile table of contents is positioned correctly.
+    top: 0px !important; // Reset top position.
+  }
+
+  .mobile-toc-2 {
+    position: sticky !important; // Make the mobile TOC sticky.
+  }
+
+  .breadcrumb-text {
+    margin-left: 4px; // Add margin to the left of breadcrumb text.
+    margin-right: 4px; // Add margin to the right of breadcrumb text.
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg); // Initial state of the spin animation.
+    }
+
+    100% {
+      transform: rotate(360deg); // Final state of the spin animation.
+    }
+  }
+</style>
+
+<!-- Load Ahrefs analytics script with a specific data key -->
+<script src="https://analytics.ahrefs.com/analytics.js" data-key="ghW8s5ijSVQ8U0ylZAtVhA" defer="true"></script>

@@ -1,10 +1,29 @@
 <style>
+  /* 
+   The following CSS styles are applied to the scrollbar of elements with the class 
+   'ck-preference__scroll-w'. This is typically used in a cookie modal to enhance 
+   the user experience by hiding the scrollbar, making the modal look cleaner and 
+   more visually appealing.
+  */
 
+  /* 
+   This rule targets the webkit-based browsers (like Chrome and Safari) and hides 
+   the scrollbar for the 'ck-preference__scroll-w' class. The '::-webkit-scrollbar' 
+   pseudo-element is used to style the scrollbar, and setting 'display: none' 
+   effectively removes it from view.
+  */
   .ck-preference__scroll-w::-webkit-scrollbar {
     display: none;
-  } .ck-preference__scroll-w {
-    -ms-overflow-style: none; 
-    scrollbar-width: none; 
   }
-  
-  </style>
+
+  /* 
+   This rule applies to all browsers that support the '-ms-overflow-style' and 
+   'scrollbar-width' properties. It ensures that the scrollbar is hidden in 
+   Internet Explorer and Edge by using '-ms-overflow-style: none', and for 
+   Firefox, it uses 'scrollbar-width: none' to achieve the same effect.
+  */
+  .ck-preference__scroll-w {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>

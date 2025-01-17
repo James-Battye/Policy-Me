@@ -1,10 +1,20 @@
 <script>
+  // Select all elements with the class 'interlink-wrapper' and store them in a NodeList called 'wrappers'
   const wrappers = document.querySelectorAll('.interlink-wrapper');
+
+  // Iterate over each wrapper element in the NodeList
   for (wrapper of wrappers) {
+    // Get all anchor ('a') elements within the current wrapper and store them in a variable called 'links'
     let links = wrapper.getElementsByTagName('a');
+
+    // Loop through each link element using a standard for loop
     for (let i = 0; i < links.length; i++) {
+      // Add a click event listener to each link
       links[i].addEventListener('click', function (event) {
-        window.analytics && window.analytics.track(`Webflow Inter Link - ${this.textContent}`, { ...utmCookies })
+        // When the link is clicked, track the event using the analytics object if it exists
+        // The event is tracked with a message that includes the text content of the clicked link
+        // The tracking also includes any relevant UTM cookies for analytics purposes
+        window.analytics && window.analytics.track(`Webflow Inter Link - ${this.textContent}`, { ...utmCookies });
       });
     }
   }

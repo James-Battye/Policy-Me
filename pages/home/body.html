@@ -1,50 +1,69 @@
 <script src="https://js.adsrvr.org/up_loader.1.1.0.js" type="text/javascript"></script>
 <script type="text/javascript">
+  // This function is called when the DOM is fully loaded and ready for manipulation
   ttd_dom_ready(function () {
 
+    // Check if the TTDUniversalPixelApi function is defined
     if (typeof TTDUniversalPixelApi === 'function') {
 
+      // Create a new instance of the TTDUniversalPixelApi
       var universalPixelApi = new TTDUniversalPixelApi();
 
+      // Initialize the universal pixel API with a specific ID, an array of identifiers, and a tracking URL
       universalPixelApi.init("md2k0fe", ["nktc6mr"], "https://insight.adsrvr.org/track/up");
     }
   });
 </script>
 
 <script>
+  // Fetch reviews data from the Reviews.io API for the specified store
   fetch('https://api.reviews.io/reviews?store=policyme-com')
-    .then(response => response.json())
+    .then(response => response.json()) // Parse the JSON response
     .then(data => {
       // Update the content of the script block with fetched data
-      const script = document.getElementById('reviews');
+      const script = document.getElementById('reviews'); // Get the script element with ID 'reviews'
+
+      // Map the fetched reviews data to a structured format for JSON-LD
       const _reviews = data.reviews.map(r => ({
-        "@type": "Review",
+        "@type": "Review", // Specify the type of the item
         "reviewRating": {
-          "@type": "Rating",
-          "ratingValue": r.rating,
+          "@type": "Rating", // Specify the type of the rating
+          "ratingValue": r.rating, // Get the rating value from the review
         },
         "author": {
-          "@type": "Person",
-          "name": r.author.name
+          "@type": "Person", // Specify the type of the author
+          "name": r.author.name // Get the author's name from the review
         },
-        "reviewBody": r.comments
+        "reviewBody": r.comments // Get the review comments
       }));
+
+      // Update the script's text content with the new structured data
       script.textContent = JSON.stringify({
-        ...JSON.parse(script.textContent),
+        ...JSON.parse(script.textContent), // Preserve existing data in the script
         aggregateRating: {
-          "@type": "AggregateRating",
-          "ratingValue": data.average_rating,
-          "reviewCount": data.review_count,
+          "@type": "AggregateRating", // Specify the type of aggregate rating
+          "ratingValue": data.average_rating, // Get the average rating from the fetched data
+          "reviewCount": data.review_count, // Get the total number of reviews
         },
-        review: _reviews,
+        review: _reviews, // Add the mapped reviews to the structured data
       });
+
+      // Get the parent element of the script to replace it
       const parent = script.parentElement;
+
+      // Create a new script element for the updated JSON-LD data
       const newScript = document.createElement('script');
-      newScript.type = 'application/ld+json';
-      newScript.id = 'reviews';
+      newScript.type = 'application/ld+json'; // Set the type for JSON-LD
+      newScript.id = 'reviews'; // Set the ID for the new script
+
+      // Set the text content of the new script to the updated JSON-LD data
       newScript.textContent = script.textContent;
+
+      // Remove the old script element from the DOM
       parent.removeChild(script);
+
+      // Append the new script element to the parent, effectively updating the content
       parent.appendChild(newScript);
     })
-    .catch(error => console.error('Error fetching data:', error));
+    .catch(error => console.error('Error fetching data:', error)); // Log any errors that occur during the fetch
 </script>
